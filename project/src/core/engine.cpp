@@ -12,6 +12,8 @@
 
 namespace gn {
 
+Engine::Engine() : Engine(Config{}) {}
+
 Engine::Engine(Config config) : m_config(std::move(config)) {}
 
 Engine::~Engine() {

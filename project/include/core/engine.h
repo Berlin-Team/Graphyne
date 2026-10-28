@@ -51,7 +51,8 @@ public:
         std::string log_file;
     };
 
-    explicit Engine(Config config = {});
+    Engine();
+    explicit Engine(Config config);
     ~Engine();
 
     Engine(const Engine&)            = delete;

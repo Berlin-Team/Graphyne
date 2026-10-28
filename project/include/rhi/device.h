@@ -46,7 +46,8 @@ public:
     Device& operator=(Device&&)      = delete;
 
     /// Initialize the Vulkan instance, surface, physical device, and logical device.
-    Result<void> initialize(platform::Window& window, const Config& cfg = {});
+    Result<void> initialize(platform::Window& window);
+    Result<void> initialize(platform::Window& window, const Config& cfg);
 
     /// Tear down all Vulkan objects. Safe to call multiple times.
     void shutdown();

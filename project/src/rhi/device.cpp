@@ -57,6 +57,10 @@ Device::~Device() {
     shutdown();
 }
 
+Result<void> Device::initialize(platform::Window& window) {
+    return initialize(window, Config{});
+}
+
 Result<void> Device::initialize(platform::Window& window, const Config& cfg) {
     if (m_device != VK_NULL_HANDLE) return Ok();
 

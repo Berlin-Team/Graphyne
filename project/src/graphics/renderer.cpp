@@ -13,6 +13,10 @@ Renderer::~Renderer() {
     shutdown();
 }
 
+Result<void> Renderer::initialize(rhi::Device& device, rhi::Swapchain& swapchain, platform::Window& window) {
+    return initialize(device, swapchain, window, Config{});
+}
+
 Result<void> Renderer::initialize(rhi::Device&      device,
                                   rhi::Swapchain&   swapchain,
                                   platform::Window& window,

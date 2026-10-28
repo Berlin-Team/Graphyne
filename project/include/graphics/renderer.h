@@ -44,10 +44,11 @@ public:
     Renderer(Renderer&&)                 = delete;
     Renderer& operator=(Renderer&&)      = delete;
 
+    Result<void> initialize(rhi::Device& device, rhi::Swapchain& swapchain, platform::Window& window);
     Result<void> initialize(rhi::Device&      device,
                             rhi::Swapchain&   swapchain,
                             platform::Window& window,
-                            const Config&     cfg = {});
+                            const Config&     cfg);
 
     void shutdown();
 

@@ -40,12 +40,10 @@ multithreading). The stack (Vulkan + SDL2, 2024) is being reviewed before new fe
 - Names that break the naming rules: `Ok()` in `core/result.h`, the colour constants in
   `graphics/color.h` (no `k` prefix), the `r_`/`g_`/`b_`/`a_` parameters there. Rename, or record them
   as exceptions in ADR 0002.
-- Clang rejects the nested `Config` struct used as a default argument (`core/engine.h:54`,
-  `graphics/renderer.h:50`, `rhi/device.h:49`: "default member initializer needed within definition of
-  enclosing class"); MSVC accepts it. Check GCC and fix.
 
 ## Done
 
 - 2026-10-28: agent setup specific to Graphyne (`AGENTS.md`, agents, skills, this roadmap).
 - 2026-10-28: style configs follow the code (ADR 0002); one-off clang-format pass; CI pins
-  clang-format 19.1.5.
+  clang-format 19.1.5. Also fixed the GCC/Clang build (nested `Config` default arguments replaced by
+  overloads) and the Windows CI job (`setup-vulkan-sdk` v1.2.1, off the disabled `actions/cache@v2`).
