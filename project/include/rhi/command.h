@@ -31,12 +31,12 @@ public:
     void shutdown();
 
     VkCommandBuffer buffer(u32 frame_index) const { return m_buffers[frame_index]; }
-    VkCommandPool   pool()                  const { return m_pool; }
+    VkCommandPool   pool() const { return m_pool; }
 
 private:
-    Device*                       m_device = nullptr;
-    VkCommandPool                 m_pool   = VK_NULL_HANDLE;
-    std::vector<VkCommandBuffer>  m_buffers;
+    Device*                      m_device = nullptr;
+    VkCommandPool                m_pool   = VK_NULL_HANDLE;
+    std::vector<VkCommandBuffer> m_buffers;
 };
 
 } // namespace gn::rhi

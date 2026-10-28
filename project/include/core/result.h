@@ -45,22 +45,22 @@ public:
     using error_type = E;
 
     Result(const T& v) : m_data(std::in_place_index<0>, v) {}
-    Result(T&& v)      : m_data(std::in_place_index<0>, std::move(v)) {}
-    Result(Err<E> e)   : m_data(std::in_place_index<1>, std::move(e.value)) {}
+    Result(T&& v) : m_data(std::in_place_index<0>, std::move(v)) {}
+    Result(Err<E> e) : m_data(std::in_place_index<1>, std::move(e.value)) {}
 
     template <class U = E, std::enable_if_t<std::is_constructible_v<E, U>, int> = 0>
     Result(Err<U> e) : m_data(std::in_place_index<1>, std::move(e.value)) {}
 
-    bool ok()  const noexcept { return m_data.index() == 0; }
-    bool err() const noexcept { return m_data.index() == 1; }
+    bool     ok() const noexcept { return m_data.index() == 0; }
+    bool     err() const noexcept { return m_data.index() == 1; }
     explicit operator bool() const noexcept { return ok(); }
 
     const T& value() const& { return std::get<0>(m_data); }
-    T&       value()      & { return std::get<0>(m_data); }
-    T&&      value()     && { return std::move(std::get<0>(m_data)); }
+    T&       value() & { return std::get<0>(m_data); }
+    T&&      value() && { return std::move(std::get<0>(m_data)); }
 
     const E& error() const& { return std::get<1>(m_data); }
-    E&       error()      & { return std::get<1>(m_data); }
+    E&       error() & { return std::get<1>(m_data); }
 
     // Provide a sensible default-on-error.
     template <class U>
@@ -82,12 +82,12 @@ public:
     Result() : m_has_error(false) {}
     Result(Err<E> e) : m_has_error(true), m_error(std::move(e.value)) {}
 
-    bool ok()  const noexcept { return !m_has_error; }
-    bool err() const noexcept { return m_has_error; }
+    bool     ok() const noexcept { return !m_has_error; }
+    bool     err() const noexcept { return m_has_error; }
     explicit operator bool() const noexcept { return ok(); }
 
     const E& error() const& { return m_error; }
-    E&       error()      & { return m_error; }
+    E&       error() & { return m_error; }
 
     static Result success() { return Result(); }
 
@@ -96,6 +96,8 @@ private:
     E    m_error{};
 };
 
-inline Result<void> Ok() { return Result<void>::success(); }
+inline Result<void> Ok() {
+    return Result<void>::success();
+}
 
 } // namespace gn

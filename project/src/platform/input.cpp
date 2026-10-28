@@ -3,9 +3,9 @@
 namespace gn::platform {
 
 void Input::begin_frame() {
-    m_key_prev    = m_key_down;
-    m_mouse_prev  = m_mouse_down;
-    m_mouse_delta = {0, 0};
+    m_key_prev     = m_key_down;
+    m_mouse_prev   = m_mouse_down;
+    m_mouse_delta  = {0, 0};
     m_scroll_delta = {0.0f, 0.0f};
 }
 
@@ -34,12 +34,10 @@ void Input::on_event(const Event& event) {
             break;
         }
         case EventType::MouseMove:
-            m_mouse_pos    = ivec2{event.mouse_move.x, event.mouse_move.y};
+            m_mouse_pos = ivec2{event.mouse_move.x, event.mouse_move.y};
             m_mouse_delta += ivec2{event.mouse_move.dx, event.mouse_move.dy};
             break;
-        case EventType::MouseScroll:
-            m_scroll_delta += vec2{event.scroll.dx, event.scroll.dy};
-            break;
+        case EventType::MouseScroll: m_scroll_delta += vec2{event.scroll.dx, event.scroll.dy}; break;
         default: break;
     }
 }

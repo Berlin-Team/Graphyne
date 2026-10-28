@@ -16,8 +16,8 @@ Checks: '*,
   -readability-function-cognitive-complexity,
   -misc-non-private-member-variables-in-classes,
   -bugprone-easily-swappable-parameters,
-  -cert-dcl58-cpp, # VLAs
-  -cert-err58-cpp, # exceptions
+  -cert-dcl58-cpp,
+  -cert-err58-cpp,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
@@ -31,7 +31,6 @@ Checks: '*,
 
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
-AnalyzeTemporaryDtors: false
 FormatStyle: none
 CheckOptions:
   - key: readability-identifier-naming.ClassCase
@@ -43,25 +42,37 @@ CheckOptions:
   - key: readability-identifier-naming.NamespaceCase
     value: lower_case
   - key: readability-identifier-naming.FunctionCase
-    value: camelBack
+    value: lower_case
   - key: readability-identifier-naming.MethodCase
-    value: camelBack
+    value: lower_case
   - key: readability-identifier-naming.VariableCase
-    value: camelBack
+    value: lower_case
   - key: readability-identifier-naming.ParameterCase
-    value: camelBack
+    value: lower_case
   - key: readability-identifier-naming.MemberCase
-    value: camelBack
+    value: lower_case
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: lower_case
+  - key: readability-identifier-naming.ProtectedMemberCase
+    value: lower_case
   - key: readability-identifier-naming.PrivateMemberPrefix
     value: m_
   - key: readability-identifier-naming.ProtectedMemberPrefix
     value: m_
   - key: readability-identifier-naming.MacroDefinitionCase
     value: UPPER_CASE
+  - key: readability-identifier-naming.MacroDefinitionPrefix
+    value: GN_
   - key: readability-identifier-naming.EnumConstantCase
-    value: UPPER_CASE
+    value: CamelCase
   - key: readability-identifier-naming.GlobalConstantCase
-    value: UPPER_CASE
+    value: CamelCase
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: k
+  - key: readability-identifier-naming.ClassConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassConstantPrefix
+    value: k
   - key: readability-identifier-naming.TemplateParameterCase
     value: CamelCase
   - key: cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors

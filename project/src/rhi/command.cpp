@@ -4,7 +4,9 @@
 
 namespace gn::rhi {
 
-CommandPool::~CommandPool() { shutdown(); }
+CommandPool::~CommandPool() {
+    shutdown();
+}
 
 Result<void> CommandPool::initialize(Device& device, u32 frame_count) {
     m_device = &device;

@@ -24,34 +24,34 @@ Key sdl_scancode_to_key(SDL_Scancode sc) {
         return static_cast<K>(static_cast<u16>(K::F1) + (sc - SDL_SCANCODE_F1));
     }
     switch (sc) {
-        case SDL_SCANCODE_SPACE:     return K::Space;
-        case SDL_SCANCODE_TAB:       return K::Tab;
-        case SDL_SCANCODE_RETURN:    return K::Enter;
-        case SDL_SCANCODE_ESCAPE:    return K::Escape;
+        case SDL_SCANCODE_SPACE: return K::Space;
+        case SDL_SCANCODE_TAB: return K::Tab;
+        case SDL_SCANCODE_RETURN: return K::Enter;
+        case SDL_SCANCODE_ESCAPE: return K::Escape;
         case SDL_SCANCODE_BACKSPACE: return K::Backspace;
-        case SDL_SCANCODE_DELETE:    return K::Delete;
-        case SDL_SCANCODE_LEFT:      return K::Left;
-        case SDL_SCANCODE_RIGHT:     return K::Right;
-        case SDL_SCANCODE_UP:        return K::Up;
-        case SDL_SCANCODE_DOWN:      return K::Down;
-        case SDL_SCANCODE_LSHIFT:    return K::LeftShift;
-        case SDL_SCANCODE_RSHIFT:    return K::RightShift;
-        case SDL_SCANCODE_LCTRL:     return K::LeftCtrl;
-        case SDL_SCANCODE_RCTRL:     return K::RightCtrl;
-        case SDL_SCANCODE_LALT:      return K::LeftAlt;
-        case SDL_SCANCODE_RALT:      return K::RightAlt;
-        default:                     return K::Unknown;
+        case SDL_SCANCODE_DELETE: return K::Delete;
+        case SDL_SCANCODE_LEFT: return K::Left;
+        case SDL_SCANCODE_RIGHT: return K::Right;
+        case SDL_SCANCODE_UP: return K::Up;
+        case SDL_SCANCODE_DOWN: return K::Down;
+        case SDL_SCANCODE_LSHIFT: return K::LeftShift;
+        case SDL_SCANCODE_RSHIFT: return K::RightShift;
+        case SDL_SCANCODE_LCTRL: return K::LeftCtrl;
+        case SDL_SCANCODE_RCTRL: return K::RightCtrl;
+        case SDL_SCANCODE_LALT: return K::LeftAlt;
+        case SDL_SCANCODE_RALT: return K::RightAlt;
+        default: return K::Unknown;
     }
 }
 
 MouseButton sdl_button_to_mouse(u8 button) {
     switch (button) {
-        case SDL_BUTTON_LEFT:   return MouseButton::Left;
-        case SDL_BUTTON_RIGHT:  return MouseButton::Right;
+        case SDL_BUTTON_LEFT: return MouseButton::Left;
+        case SDL_BUTTON_RIGHT: return MouseButton::Right;
         case SDL_BUTTON_MIDDLE: return MouseButton::Middle;
-        case SDL_BUTTON_X1:     return MouseButton::X1;
-        case SDL_BUTTON_X2:     return MouseButton::X2;
-        default:                return MouseButton::Left;
+        case SDL_BUTTON_X1: return MouseButton::X1;
+        case SDL_BUTTON_X2: return MouseButton::X2;
+        default: return MouseButton::Left;
     }
 }
 
@@ -66,7 +66,7 @@ Result<void> Window::initialize(const Config& cfg) {
 
     Uint32 flags = SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN;
     if (cfg.resizable) flags |= SDL_WINDOW_RESIZABLE;
-    if (cfg.high_dpi)  flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+    if (cfg.high_dpi) flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 
     m_window = SDL_CreateWindow(cfg.title.c_str(),
                                 SDL_WINDOWPOS_CENTERED,
@@ -97,12 +97,12 @@ void Window::shutdown() {
 
 void Window::pump_events(const EventHandler& handler) {
     SDL_Event sdl;
-    Event ev{};
+    Event     ev{};
     while (SDL_PollEvent(&sdl)) {
         switch (sdl.type) {
             case SDL_QUIT:
                 m_should_close = true;
-                ev.type = EventType::WindowClose;
+                ev.type        = EventType::WindowClose;
                 if (handler) handler(ev);
                 break;
 
@@ -110,27 +110,23 @@ void Window::pump_events(const EventHandler& handler) {
                 switch (sdl.window.event) {
                     case SDL_WINDOWEVENT_CLOSE:
                         m_should_close = true;
-                        ev.type = EventType::WindowClose;
+                        ev.type        = EventType::WindowClose;
                         if (handler) handler(ev);
                         break;
 
                     case SDL_WINDOWEVENT_RESIZED:
                     case SDL_WINDOWEVENT_SIZE_CHANGED:
-                        m_extent.width  = static_cast<u32>(sdl.window.data1);
-                        m_extent.height = static_cast<u32>(sdl.window.data2);
-                        m_minimized     = (m_extent.width == 0 || m_extent.height == 0);
-                        ev.type = EventType::WindowResize;
+                        m_extent.width   = static_cast<u32>(sdl.window.data1);
+                        m_extent.height  = static_cast<u32>(sdl.window.data2);
+                        m_minimized      = (m_extent.width == 0 || m_extent.height == 0);
+                        ev.type          = EventType::WindowResize;
                         ev.resize.width  = m_extent.width;
                         ev.resize.height = m_extent.height;
                         if (handler) handler(ev);
                         break;
 
-                    case SDL_WINDOWEVENT_MINIMIZED:
-                        m_minimized = true;
-                        break;
-                    case SDL_WINDOWEVENT_RESTORED:
-                        m_minimized = false;
-                        break;
+                    case SDL_WINDOWEVENT_MINIMIZED: m_minimized = true; break;
+                    case SDL_WINDOWEVENT_RESTORED: m_minimized = false; break;
 
                     case SDL_WINDOWEVENT_FOCUS_GAINED:
                         ev.type = EventType::WindowFocusGained;
@@ -148,7 +144,7 @@ void Window::pump_events(const EventHandler& handler) {
 
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                ev.type = (sdl.type == SDL_KEYDOWN) ? EventType::KeyDown : EventType::KeyUp;
+                ev.type       = (sdl.type == SDL_KEYDOWN) ? EventType::KeyDown : EventType::KeyUp;
                 ev.key.key    = sdl_scancode_to_key(sdl.key.keysym.scancode);
                 ev.key.mods   = static_cast<u16>(sdl.key.keysym.mod);
                 ev.key.repeat = sdl.key.repeat != 0;
@@ -157,15 +153,15 @@ void Window::pump_events(const EventHandler& handler) {
 
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
-                ev.type = (sdl.type == SDL_MOUSEBUTTONDOWN) ? EventType::MouseDown : EventType::MouseUp;
+                ev.type                = (sdl.type == SDL_MOUSEBUTTONDOWN) ? EventType::MouseDown : EventType::MouseUp;
                 ev.mouse_button.button = sdl_button_to_mouse(sdl.button.button);
-                ev.mouse_button.x = sdl.button.x;
-                ev.mouse_button.y = sdl.button.y;
+                ev.mouse_button.x      = sdl.button.x;
+                ev.mouse_button.y      = sdl.button.y;
                 if (handler) handler(ev);
                 break;
 
             case SDL_MOUSEMOTION:
-                ev.type = EventType::MouseMove;
+                ev.type          = EventType::MouseMove;
                 ev.mouse_move.x  = sdl.motion.x;
                 ev.mouse_move.y  = sdl.motion.y;
                 ev.mouse_move.dx = sdl.motion.xrel;
@@ -174,7 +170,7 @@ void Window::pump_events(const EventHandler& handler) {
                 break;
 
             case SDL_MOUSEWHEEL:
-                ev.type = EventType::MouseScroll;
+                ev.type      = EventType::MouseScroll;
                 ev.scroll.dx = static_cast<f32>(sdl.wheel.x);
                 ev.scroll.dy = static_cast<f32>(sdl.wheel.y);
                 if (handler) handler(ev);

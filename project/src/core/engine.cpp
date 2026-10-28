@@ -12,9 +12,13 @@
 
 namespace gn {
 
+Engine::Engine() : Engine(Config{}) {}
+
 Engine::Engine(Config config) : m_config(std::move(config)) {}
 
-Engine::~Engine() { shutdown(); }
+Engine::~Engine() {
+    shutdown();
+}
 
 Result<void> Engine::initialize() {
     if (m_initialized) return Ok();
@@ -137,8 +141,14 @@ int Engine::run(App& app) {
     return 0;
 }
 
-platform::Window&  Engine::window()   { return *m_window; }
-platform::Input&   Engine::input()    { return *m_input; }
-graphics::Renderer& Engine::renderer() { return *m_renderer; }
+platform::Window& Engine::window() {
+    return *m_window;
+}
+platform::Input& Engine::input() {
+    return *m_input;
+}
+graphics::Renderer& Engine::renderer() {
+    return *m_renderer;
+}
 
 } // namespace gn

@@ -18,5 +18,9 @@ constants `kName`; macros `GN_NAME`; namespaces lower case. `.clang-format` targ
 
 ## Consequences
 
-A small config diff instead of reformatting and renaming every file; `git blame` stays useful and the
-public API keeps its names. The CI format check can go green. Roadmap item 1 does the change.
+No renames: the public API keeps its names. The code was formatted by hand and not consistently, so no
+config reproduces it exactly; item 1 also ran clang-format once over 39 files (whitespace and line
+wrapping, plus three `// namespace x` closing comments; no code token changed). That commit belongs in `.git-blame-ignore-revs` so `git blame` stays
+useful. clang-format output differs between versions, so CI pins clang-format 19.1.5, the version bundled
+with Visual Studio 2022 here. A few names don't fit the naming rules (`Ok()` in `core/result.h`, the
+colour constants in `graphics/color.h`); they are on the roadmap backlog.

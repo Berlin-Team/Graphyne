@@ -17,8 +17,7 @@ Result<void> Platform::initialize() {
         return Err{Error{std::string("SDL_Init failed: ") + SDL_GetError()}};
     }
     m_initialized = true;
-    GN_INFO("Platform initialized (SDL {}.{}.{})",
-            SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
+    GN_INFO("Platform initialized (SDL {}.{}.{})", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
     return Ok();
 }
 

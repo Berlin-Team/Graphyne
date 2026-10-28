@@ -7,10 +7,10 @@ Clock::Clock() {
 }
 
 void Clock::reset() {
-    m_start       = HighResClock::now();
-    m_last_tick   = m_start;
-    m_first_tick  = true;
-    m_last_delta  = 0.0f;
+    m_start      = HighResClock::now();
+    m_last_tick  = m_start;
+    m_first_tick = true;
+    m_last_delta = 0.0f;
 }
 
 f32 Clock::tick() {
@@ -22,8 +22,8 @@ f32 Clock::tick() {
         return 0.0f;
     }
     const auto delta = std::chrono::duration_cast<std::chrono::duration<f32>>(now - m_last_tick).count();
-    m_last_tick  = now;
-    m_last_delta = delta;
+    m_last_tick      = now;
+    m_last_delta     = delta;
     return delta;
 }
 

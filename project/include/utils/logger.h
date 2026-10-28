@@ -33,19 +33,17 @@ public:
 
     /// Idempotent. Safe to call multiple times — subsequent calls are no-ops.
     /// `log_file` empty means console-only.
-    bool initialize(const std::string& log_file = "",
-                    LogLevel level = LogLevel::Info,
-                    bool to_console = true);
+    bool initialize(const std::string& log_file = "", LogLevel level = LogLevel::Info, bool to_console = true);
 
     void shutdown();
 
-    void set_level(LogLevel level);
+    void     set_level(LogLevel level);
     LogLevel level() const { return m_level; }
 
     bool initialized() const { return m_initialized; }
 
 private:
-    Logger() = default;
+    Logger()  = default;
     ~Logger() = default;
 
     Logger(const Logger&)            = delete;

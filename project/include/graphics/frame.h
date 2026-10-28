@@ -34,8 +34,8 @@ public:
     /// Active command buffer for this frame. Set by Renderer::begin_frame.
     VkCommandBuffer cmd = VK_NULL_HANDLE;
     /// Target swapchain image view (color attachment).
-    VkImageView target_view = VK_NULL_HANDLE;
-    VkImage     target_image = VK_NULL_HANDLE;
+    VkImageView target_view   = VK_NULL_HANDLE;
+    VkImage     target_image  = VK_NULL_HANDLE;
     Extent2D    target_extent = {0, 0};
 };
 
