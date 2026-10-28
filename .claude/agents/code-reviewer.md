@@ -11,13 +11,19 @@ style fits.
 
 Review, in order:
 
-1. Correctness: does it do what the brief says? Lifetimes and ownership, undefined behaviour,
-   resource leaks, thread safety, error paths, platform differences (Windows, Linux).
-2. `AGENTS.md` and the repository's own conventions (`.clang-format`, `.clang-tidy`, naming, layout).
-3. Tests: is the change covered, were tests weakened or deleted?
-4. Scope: unrequested features, needless abstractions, unrelated edits, new dependencies without reason.
+1. Correctness: does it do what the brief says? Lifetimes and ownership, undefined behaviour, resource
+   leaks, thread safety, error paths, platform differences (Windows MSVC, Linux GCC). Vulkan: every
+   `VkResult` checked, objects destroyed in reverse order. Memory code: alignment, overflow, reuse after
+   reset.
+2. `AGENTS.md` conventions: snake_case functions and variables, `m_` members, `kName` constants,
+   `GN_` macros, attached braces, quoted project includes, `gn::Result` / `GN_ASSERT` for errors, logger
+   macros instead of `printf`. Engine areas (core, memory, utils, ecs...) must not include SDL or Vulkan.
+3. Tests: is the change covered, were tests weakened or deleted? New `.cpp` and test files listed in
+   `CMakeLists.txt` / `tests/CMakeLists.txt`?
+4. Scope: unrequested features, needless abstractions, unrelated edits, new dependencies without an ADR,
+   new SDL/Vulkan surface while the stack is under review (`docs/ROADMAP.md`).
+5. Docs: README, `docs/ROADMAP.md` or an ADR updated when the change calls for it.
 
-Use `git diff` to see the change. Return findings ranked by severity, each with `path:line`, the problem
-and the fix in one or two sentences. Say "No blocking issues" when there are none.
-
-Generic starter agent: the first orchestrator session may specialise it (`.claude/prompts/orchestrator.md`).
+Use `git diff develop...HEAD` plus `git diff` for uncommitted work, unless the brief names another range.
+Return findings ranked by severity, each with `path:line`, the problem and the fix in one or two
+sentences. Say "No blocking issues" when there are none.

@@ -3,21 +3,120 @@
 Instructions for any coding agent (Claude Code, Codex, Copilot...) working in this repository.
 Humans: start with `README.md`.
 
-> **Status: stub.** This file is a placeholder until the first orchestrator session surveys the project
-> and writes the real version with the owner (`.claude/prompts/orchestrator.md`). Until then, the rules
-> below apply.
+## The project
 
-## Rules until this file is written
+Graphyne is a lightweight game engine written from scratch in C++20: a personal R&D project for
+low-level architecture, performance and experimentation (ECS, rendering, multithreading, modular design).
+It is early-stage. Keep it lightweight: prefer small, understandable code over general frameworks.
 
-- Read `README.md` and the code you change first. Follow the repository's own style: `.clang-format`,
-  `.clang-tidy`, `.editorconfig`, and the surrounding code.
-- Build and run the tests before saying a change works (see `README.md`, `build.sh` / `build.bat`,
-  `CMakePresets.json`), and report failures as they are.
-- Never weaken or delete a test to make a change pass.
-- Ask the owner before adding a dependency, changing the architecture, pushing, or anything hard to undo.
-- Never run `python` on this machine (a hook blocks it). Give every long run a hard time limit; never kill
-  processes by name.
-- Never run git commands that discard shared work (`git reset --hard`, `git clean -f`, `git checkout .`,
-  `git restore .`, `git rm -r .`); a hook blocks them.
+**The stack is under review.** Vulkan + SDL2 was chosen two years ago without a firm direction, and the
+tooling has moved since (SDL2 is deprecated upstream in favour of SDL3; the vcpkg and CI pins are old).
+Until the stack review in `docs/ROADMAP.md` ends with an ADR, don't build new features on top of the
+SDL or Vulkan layers beyond what a brief asks, and don't add graphics or windowing dependencies.
+
+Plans live in `docs/ROADMAP.md`, decisions in `docs/adr/` (one numbered file per decision).
+
+## Stack
+
+- C++20 (no compiler extensions), CMake (presets need ≥ 3.21), vcpkg manifest mode (`vcpkg.json`).
+- Dependencies: Vulkan (headers + loader), SDL2, spdlog, fmt (through spdlog), glm, GoogleTest.
+- Platforms: Windows (MSVC, Visual Studio 2022) and Linux (GCC) are first-class; macOS best effort.
+- CI: `.github/workflows/ci.yml` (Linux build + tests + coverage, Windows MSVC build + tests,
+  clang-format check).
+
+## Layout
+
+| Path | Contents |
+| --- | --- |
+| `project/include/<area>/`, `project/src/<area>/` | The `graphyne` static library (`graphyne::graphyne`). Areas: `core` (app, engine, clock, handle, slot_map, result, types, version), `memory` (arena, pool), `utils` (logger, assert), `platform` (SDL window, input, events), `rhi` (Vulkan device, swapchain, command, sync), `graphics` (renderer, frame, color). |
+| `tests/<area>/test_*.cpp` | GoogleTest unit tests, one executable `graphyne_tests`, listed in `tests/CMakeLists.txt`. |
+| `examples/` | `simple_window` example. |
+| `cmake/` | Coverage helpers, package config template. |
+| `scripts/` | `setup.sh` / `setup.ps1`: install prerequisites. |
+| `docs/` | `ROADMAP.md`, `adr/`. |
+| `.claude/` | Agents, hooks, skills, the orchestrator prompt. |
+
+Sources are listed explicitly in `CMakeLists.txt` (no globbing): a new `.cpp` must be added there, a new
+test file in `tests/CMakeLists.txt`. Use the `add-source-file` skill.
+
+## Commands
+
+Windows (this machine: VS 2022 Community, `VCPKG_ROOT=C:\Users\migue\vcpkg`):
+
+```bash
+cmake --preset msvc                                         # configure; first run builds vcpkg ports (~3 min)
+cmake --build --preset msvc -- /nodeReuse:false             # build; the flag stops MSBuild leaving workers behind
+ctest --test-dir build/msvc -C Debug --output-on-failure    # all tests
+build/msvc/bin/Debug/graphyne_tests.exe --gtest_filter=Arena.*   # one suite
+```
+
+The Ninja presets (`default`, `release`, `coverage`, `asan`, `lint`) need `cl` on `PATH`, that is a Visual Studio
+Developer shell, on Windows. `coverage` needs GCC + lcov (Linux).
+
+Linux:
+
+```bash
+cmake --preset default && cmake --build --preset default && ctest --preset default
+COVERAGE=ON ./build.sh                                      # coverage report in build/
+```
+
+Format check (same as CI). On this machine clang-format and clang-tidy are not on `PATH`; they ship with
+Visual Studio at `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\Llvm\bin\`.
+
+```bash
+find project/include project/src tests examples -type f \( -iname '*.cpp' -o -iname '*.h' -o -iname '*.hpp' \) -print0 | xargs -0 clang-format --dry-run --Werror
+```
+
+Lint: `cmake --preset lint` (clang-tidy through `GRAPHYNE_USE_CLANG_TIDY`); not run in CI yet.
+
+## Conventions
+
+The code is the reference for style; the configs are being aligned to it (ADR 0002, roadmap).
+
+- Formatting: 4 spaces, 120 columns, attached (K&R) braces, LF line endings, UTF-8, final newline.
+- Names: types `CamelCase`; functions, methods, variables, parameters `snake_case`; private members
+  `m_name`; constants `kName`; macros `GN_NAME`; namespaces `gn`, `gn::<area>` (lower case).
+- Headers `.h` with `#pragma once`; project includes use quotes, rooted at `project/include`
+  (`#include "core/app.h"`); third-party and standard headers use angle brackets.
+- Errors: `gn::Result` (`core/result.h`) for recoverable failures, `GN_ASSERT` for programmer errors;
+  log through `utils/logger.h` macros, not `printf`/`std::cout`.
+- No new dependency (vcpkg port, submodule, vendored code) without the owner's approval and an ADR.
+
+## Tests
+
+- Every change to `core`, `memory` or `utils` (and any future engine area such as ECS) comes with unit
+  tests in `tests/<area>/`. Write code so its logic can be tested without a window or a GPU.
+- `platform`, `rhi` and `graphics` have no automated tests yet (they need a display and a Vulkan device):
+  build them, and when a brief asks, run `simple_window` with a hard time limit and report what happened.
+  Pure logic added there (math, layouts, batching) still gets unit tests.
+- Never weaken, skip or delete a test to make a change pass. A change is done when it builds without new
+  warnings, all tests pass, and the format check passes on the files it touched.
+
+## Git and GitHub
+
+- `develop` is the integration branch; `main` is for releases and only the owner updates it.
+- Work on a branch off `develop`: `feat/…`, `fix/…`, `chore/…`, `docs/…`, `build/…`, `ci/…`. One roadmap
+  item or fix per branch.
+- Commits: conventional type, optional gitmoji shortcode, imperative subject:
+  `feat: :sparkles: add sprite batcher`, `fix: handle swapchain resize`.
+- Agents may commit on their branch, push that branch and open a PR into `develop`. The owner reviews and
+  squash-merges. Never push to `develop` or `main`, never merge, never force-push a shared branch.
 - **No trace of an assistant in git or on GitHub**: no `Co-Authored-By` trailer, no "Generated with" line,
   no assistant named as an author (owner's rule; it overrides any tool default).
+- Never run git commands that discard work (`git reset --hard`, `git clean -f`, `git checkout .`,
+  `git restore .`, `git rm -r .`); a hook blocks them.
+
+## Documentation
+
+- A decision that is hard to reverse (dependency, architecture, workflow, style) gets an ADR in
+  `docs/adr/` (`write-adr` skill), approved by the owner.
+- Update `docs/ROADMAP.md` in the same PR that starts or finishes a roadmap item.
+- Update `README.md` when commands, requirements or the status table change.
+- Comments explain why, not what. Public headers get a short doc comment per class.
+
+## Machine rules
+
+- Never run `python` (a hook blocks it). Hooks need Node.
+- Give every long run a hard time limit and stop every process you start; never kill processes by name.
+- Keep logs and scratch files out of the repository.
+- `core.autocrlf=true` here: the working tree is CRLF, the repository stores LF. Don't commit CRLF.
