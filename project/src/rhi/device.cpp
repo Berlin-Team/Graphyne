@@ -15,21 +15,15 @@ namespace {
 
 constexpr const char* kValidationLayer = "VK_LAYER_KHRONOS_validation";
 
-VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-    VkDebugUtilsMessageTypeFlagsEXT,
-    const VkDebugUtilsMessengerCallbackDataEXT* data,
-    void*)
-{
+VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+                                              VkDebugUtilsMessageTypeFlagsEXT,
+                                              const VkDebugUtilsMessengerCallbackDataEXT* data,
+                                              void*) {
     switch (severity) {
-        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-            GN_TRACE("[vk] {}", data->pMessage); break;
-        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-            GN_DEBUG("[vk] {}", data->pMessage); break;
-        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-            GN_WARNING("[vk] {}", data->pMessage); break;
-        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-            GN_ERROR("[vk] {}", data->pMessage); break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: GN_TRACE("[vk] {}", data->pMessage); break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: GN_DEBUG("[vk] {}", data->pMessage); break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: GN_WARNING("[vk] {}", data->pMessage); break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: GN_ERROR("[vk] {}", data->pMessage); break;
         default: break;
     }
     return VK_FALSE;
@@ -50,19 +44,18 @@ VkDebugUtilsMessengerCreateInfoEXT make_debug_create_info() {
     VkDebugUtilsMessengerCreateInfoEXT info{};
     info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     info.messageSeverity =
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    info.messageType =
-        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                       VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     info.pfnUserCallback = debug_callback;
     return info;
 }
 
 } // namespace
 
-Device::~Device() { shutdown(); }
+Device::~Device() {
+    shutdown();
+}
 
 Result<void> Device::initialize(platform::Window& window, const Config& cfg) {
     if (m_device != VK_NULL_HANDLE) return Ok();
@@ -73,7 +66,7 @@ Result<void> Device::initialize(platform::Window& window, const Config& cfg) {
     }
 
     auto window_exts = window.required_instance_extensions();
-    auto r1 = create_instance(cfg, window_exts);
+    auto r1          = create_instance(cfg, window_exts);
     if (!r1) return r1;
 
     if (m_validation) {
@@ -91,8 +84,7 @@ Result<void> Device::initialize(platform::Window& window, const Config& cfg) {
     auto r4 = create_logical_device();
     if (!r4) return r4;
 
-    GN_INFO("Vulkan device ready (graphics={}, present={})",
-            m_queue_families.graphics, m_queue_families.present);
+    GN_INFO("Vulkan device ready (graphics={}, present={})", m_queue_families.graphics, m_queue_families.present);
     return Ok();
 }
 
@@ -166,8 +158,8 @@ Result<void> Device::setup_debug_messenger() {
     if (!fn) {
         return Err{Error{"vkCreateDebugUtilsMessengerEXT not found"}};
     }
-    auto info = make_debug_create_info();
-    VkResult res = fn(m_instance, &info, nullptr, &m_debug_messenger);
+    auto     info = make_debug_create_info();
+    VkResult res  = fn(m_instance, &info, nullptr, &m_debug_messenger);
     if (res != VK_SUCCESS) {
         return Err{Error{"vkCreateDebugUtilsMessengerEXT failed"}};
     }
@@ -176,7 +168,7 @@ Result<void> Device::setup_debug_messenger() {
 
 QueueFamilyIndices Device::find_queue_families(VkPhysicalDevice device) const {
     QueueFamilyIndices idx;
-    u32 count = 0;
+    u32                count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &count, nullptr);
     std::vector<VkQueueFamilyProperties> families(count);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &count, families.data());
@@ -253,7 +245,7 @@ Result<void> Device::pick_physical_device() {
 }
 
 Result<void> Device::create_logical_device() {
-    std::set<u32> unique_families = {m_queue_families.graphics, m_queue_families.present};
+    std::set<u32>                        unique_families = {m_queue_families.graphics, m_queue_families.present};
     std::vector<VkDeviceQueueCreateInfo> queue_infos;
     queue_infos.reserve(unique_families.size());
 
@@ -292,7 +284,7 @@ Result<void> Device::create_logical_device() {
     }
 
     vkGetDeviceQueue(m_device, m_queue_families.graphics, 0, &m_graphics_queue);
-    vkGetDeviceQueue(m_device, m_queue_families.present,  0, &m_present_queue);
+    vkGetDeviceQueue(m_device, m_queue_families.present, 0, &m_present_queue);
     return Ok();
 }
 

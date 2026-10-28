@@ -7,7 +7,9 @@
 using gn::SlotMap;
 
 namespace {
-struct Thing { int value = 0; };
+struct Thing {
+    int value = 0;
+};
 struct ThingTag;
 using ThingMap = SlotMap<Thing, ThingTag>;
 } // namespace
@@ -20,7 +22,7 @@ TEST(SlotMap, EmptyOnConstruction) {
 
 TEST(SlotMap, InsertAndGet) {
     ThingMap m;
-    auto h = m.insert({42});
+    auto     h = m.insert({42});
     ASSERT_TRUE(h.valid());
     ASSERT_NE(m.get(h), nullptr);
     EXPECT_EQ(m.get(h)->value, 42);
@@ -29,7 +31,7 @@ TEST(SlotMap, InsertAndGet) {
 
 TEST(SlotMap, EraseInvalidatesHandle) {
     ThingMap m;
-    auto h = m.insert({1});
+    auto     h = m.insert({1});
     EXPECT_TRUE(m.contains(h));
     EXPECT_TRUE(m.erase(h));
     EXPECT_FALSE(m.contains(h));
@@ -39,18 +41,18 @@ TEST(SlotMap, EraseInvalidatesHandle) {
 
 TEST(SlotMap, RecyclesSlotWithNewGeneration) {
     ThingMap m;
-    auto h1 = m.insert({10});
+    auto     h1 = m.insert({10});
     m.erase(h1);
     auto h2 = m.insert({20});
-    EXPECT_EQ(h1.index(), h2.index());                // same slot
-    EXPECT_NE(h1.generation(), h2.generation());      // different generation
+    EXPECT_EQ(h1.index(), h2.index());           // same slot
+    EXPECT_NE(h1.generation(), h2.generation()); // different generation
     EXPECT_FALSE(m.contains(h1));
     EXPECT_TRUE(m.contains(h2));
     EXPECT_EQ(m.get(h2)->value, 20);
 }
 
 TEST(SlotMap, MultipleInsertsAndIteration) {
-    ThingMap m;
+    ThingMap                       m;
     std::vector<ThingMap::HandleT> handles;
     for (int i = 0; i < 5; ++i) handles.push_back(m.insert({i * 10}));
     EXPECT_EQ(m.size(), 5u);
@@ -65,9 +67,9 @@ TEST(SlotMap, MultipleInsertsAndIteration) {
 
 TEST(SlotMap, EraseMiddlePreservesOthers) {
     ThingMap m;
-    auto a = m.insert({1});
-    auto b = m.insert({2});
-    auto c = m.insert({3});
+    auto     a = m.insert({1});
+    auto     b = m.insert({2});
+    auto     c = m.insert({3});
     EXPECT_TRUE(m.erase(b));
     EXPECT_TRUE(m.contains(a));
     EXPECT_FALSE(m.contains(b));
@@ -78,21 +80,21 @@ TEST(SlotMap, EraseMiddlePreservesOthers) {
 
 TEST(SlotMap, EraseWithStaleHandleFails) {
     ThingMap m;
-    auto h = m.insert({1});
+    auto     h = m.insert({1});
     EXPECT_TRUE(m.erase(h));
-    EXPECT_FALSE(m.erase(h));   // double-erase
+    EXPECT_FALSE(m.erase(h)); // double-erase
 }
 
 TEST(SlotMap, ClearResetsEverything) {
     ThingMap m;
-    auto h = m.insert({5});
+    auto     h = m.insert({5});
     m.clear();
     EXPECT_EQ(m.size(), 0u);
     EXPECT_FALSE(m.contains(h));
 }
 
 TEST(SlotMap, DefaultHandleNeverContained) {
-    ThingMap m;
+    ThingMap          m;
     ThingMap::HandleT h;
     EXPECT_FALSE(m.contains(h));
     EXPECT_EQ(m.get(h), nullptr);

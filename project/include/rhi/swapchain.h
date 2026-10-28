@@ -43,20 +43,20 @@ public:
     /// Returns false if the swapchain became out-of-date.
     bool present(VkQueue queue, VkSemaphore wait, u32 image_index);
 
-    VkSwapchainKHR        handle()       const { return m_swapchain; }
-    VkFormat              image_format() const { return m_format; }
-    Extent2D              extent()       const { return m_extent; }
-    const std::vector<VkImage>&     images()      const { return m_images; }
-    const std::vector<VkImageView>& image_views() const { return m_views;  }
+    VkSwapchainKHR                  handle() const { return m_swapchain; }
+    VkFormat                        image_format() const { return m_format; }
+    Extent2D                        extent() const { return m_extent; }
+    const std::vector<VkImage>&     images() const { return m_images; }
+    const std::vector<VkImageView>& image_views() const { return m_views; }
 
 private:
-    Device*                  m_device     = nullptr;
-    VkSwapchainKHR           m_swapchain  = VK_NULL_HANDLE;
+    Device*                  m_device    = nullptr;
+    VkSwapchainKHR           m_swapchain = VK_NULL_HANDLE;
     std::vector<VkImage>     m_images;
     std::vector<VkImageView> m_views;
-    VkFormat                 m_format     = VK_FORMAT_UNDEFINED;
-    Extent2D                 m_extent     = {0, 0};
-    bool                     m_vsync      = true;
+    VkFormat                 m_format = VK_FORMAT_UNDEFINED;
+    Extent2D                 m_extent = {0, 0};
+    bool                     m_vsync  = true;
 };
 
 } // namespace gn::rhi

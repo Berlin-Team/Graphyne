@@ -35,22 +35,23 @@ public:
     /// Return a previously-acquired block to the pool.
     void release(void* ptr);
 
-    usize block_size()  const { return m_block_size; }
+    usize block_size() const { return m_block_size; }
     usize block_count() const { return m_block_count; }
-    usize used()        const { return m_used; }
-    usize available()   const { return m_block_count - m_used; }
+    usize used() const { return m_used; }
+    usize available() const { return m_block_count - m_used; }
 
 private:
-    struct FreeNode { FreeNode* next; };
+    struct FreeNode {
+        FreeNode* next;
+    };
 
-    u8*        m_buffer          = nullptr;
-    FreeNode*  m_free_head       = nullptr;
-    usize      m_block_size      = 0;       // bytes per block (aligned)
-    usize      m_block_alignment = 0;       // alignment used at allocation
-    usize      m_block_count     = 0;
-    usize      m_used            = 0;
+    u8*       m_buffer          = nullptr;
+    FreeNode* m_free_head       = nullptr;
+    usize     m_block_size      = 0; // bytes per block (aligned)
+    usize     m_block_alignment = 0; // alignment used at allocation
+    usize     m_block_count     = 0;
+    usize     m_used            = 0;
 };
-
 
 /// Type-safe wrapper that returns/accepts T* and constructs/destructs in place.
 template <class T>
@@ -73,9 +74,9 @@ public:
         m_pool.release(obj);
     }
 
-    usize used()      const { return m_pool.used(); }
+    usize used() const { return m_pool.used(); }
     usize available() const { return m_pool.available(); }
-    usize capacity()  const { return m_pool.block_count(); }
+    usize capacity() const { return m_pool.block_count(); }
 
 private:
     PoolAllocator m_pool;

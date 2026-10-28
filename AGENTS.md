@@ -75,7 +75,7 @@ The code is the reference for style; the configs are being aligned to it (ADR 00
 
 - Formatting: 4 spaces, 120 columns, attached (K&R) braces, LF line endings, UTF-8, final newline.
 - Names: types `CamelCase`; functions, methods, variables, parameters `snake_case`; private members
-  `m_name`; constants `kName`; macros `GN_NAME`; namespaces `gn`, `gn::<area>` (lower case).
+  `m_name`; global and class constants `kName`; enum constants `CamelCase` (no prefix); macros `GN_NAME`; namespaces `gn`, `gn::<area>` (lower case).
 - Headers `.h` with `#pragma once`; project includes use quotes, rooted at `project/include`
   (`#include "core/app.h"`); third-party and standard headers use angle brackets.
 - Errors: `gn::Result` (`core/result.h`) for recoverable failures, `GN_ASSERT` for programmer errors;

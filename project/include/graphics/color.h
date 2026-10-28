@@ -25,14 +25,16 @@ struct Color {
 };
 
 namespace colors {
-inline constexpr Color Black   {0.0f, 0.0f, 0.0f, 1.0f};
-inline constexpr Color White   {1.0f, 1.0f, 1.0f, 1.0f};
-inline constexpr Color Red     {1.0f, 0.0f, 0.0f, 1.0f};
-inline constexpr Color Green   {0.0f, 1.0f, 0.0f, 1.0f};
-inline constexpr Color Blue    {0.0f, 0.0f, 1.0f, 1.0f};
+inline constexpr Color Black{0.0f, 0.0f, 0.0f, 1.0f};
+inline constexpr Color White{1.0f, 1.0f, 1.0f, 1.0f};
+inline constexpr Color Red{1.0f, 0.0f, 0.0f, 1.0f};
+inline constexpr Color Green{0.0f, 1.0f, 0.0f, 1.0f};
+inline constexpr Color Blue{0.0f, 0.0f, 1.0f, 1.0f};
 inline constexpr Color CornflowerBlue{0.39f, 0.58f, 0.93f, 1.0f};
 } // namespace colors
 
 } // namespace gn::graphics
 
-namespace gn { using graphics::Color; }
+namespace gn {
+using graphics::Color;
+}

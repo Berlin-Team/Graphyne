@@ -8,27 +8,22 @@ multithreading). The stack (Vulkan + SDL2, 2024) is being reviewed before new fe
 
 ## Now
 
-1. **Align the style configs with the code** (ADR 0002). `.clang-format`: attached braces and the other
-   options the code already follows; `Standard: c++20`. `.clang-tidy`: snake_case functions, methods,
-   variables and parameters, `m_` private members, `kName` constants; move the comments out of the
-   `Checks:` string (they currently swallow two exclusions). Done when the CI format check passes with
-   at most whitespace-level code changes.
-2. **Refresh the toolchain.** Add a `builtin-baseline` to `vcpkg.json` (there is none) and use the same
+1. **Refresh the toolchain.** Add a `builtin-baseline` to `vcpkg.json` (there is none) and use the same
    vcpkg commit in the Windows CI job instead of `2024.01.12`; decide whether Linux CI keeps apt packages
    or moves to vcpkg; drop the unused `tests` feature; `find_package(GTest CONFIG REQUIRED)`; Linux CI off
    `ubuntu-22.04`; Windows CI Vulkan SDK off 1.3.243; README says CMake ≥ 3.21 (presets v3) and that
    presets need `VCPKG_ROOT`; fix the stale "tests don't run" comment in `ci.yml`. Done when local and
    Windows CI builds resolve the same port versions and all CI jobs are green.
-3. **Stack review → ADR 0003** (owner decides). Windowing: SDL2 (deprecated upstream) → SDL3, or other.
+2. **Stack review → ADR 0003** (owner decides). Windowing: SDL2 (deprecated upstream) → SDL3, or other.
    Graphics: raw Vulkan, SDL3 GPU API, or another layer, judged against "lightweight and experimental".
    Research with `docs-researcher`, present options with costs, record the owner's choice, then plan the
    migration as its own item.
 
 ## Next
 
-4. **Textures and sprites** on the chosen stack (`origin/feat/texture-rendering` holds earlier work;
-   reassess it after item 3).
-5. **ECS and scenes**: the main experiment. Pure C++, fully unit-tested, independent of rendering.
+3. **Textures and sprites** on the chosen stack (`origin/feat/texture-rendering` holds earlier work;
+   reassess it after item 2).
+4. **ECS and scenes**: the main experiment. Pure C++, fully unit-tested, independent of rendering.
 
 ## Backlog
 
@@ -40,7 +35,17 @@ multithreading). The stack (Vulkan + SDL2, 2024) is being reviewed before new fe
 - `core/app.h` doc comments name `gn::Frame`; the real type is `graphics::Frame`.
 - Test presets for `asan`, `lint`, `msvc`; consider clang-tidy and ASan in CI.
 - README layout section is out of date.
+- Add the squash commit of the style-config PR to `.git-blame-ignore-revs` (the hash exists only after
+  the merge).
+- Names that break the naming rules: `Ok()` in `core/result.h`, the colour constants in
+  `graphics/color.h` (no `k` prefix), the `r_`/`g_`/`b_`/`a_` parameters there. Rename, or record them
+  as exceptions in ADR 0002.
+- Clang rejects the nested `Config` struct used as a default argument (`core/engine.h:54`,
+  `graphics/renderer.h:50`, `rhi/device.h:49`: "default member initializer needed within definition of
+  enclosing class"); MSVC accepts it. Check GCC and fix.
 
 ## Done
 
 - 2026-10-28: agent setup specific to Graphyne (`AGENTS.md`, agents, skills, this roadmap).
+- 2026-10-28: style configs follow the code (ADR 0002); one-off clang-format pass; CI pins
+  clang-format 19.1.5.

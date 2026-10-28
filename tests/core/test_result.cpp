@@ -49,9 +49,9 @@ TEST(Result, MoveOnlyValue) {
     struct MoveOnly {
         int v;
         MoveOnly(int x) : v(x) {}
-        MoveOnly(MoveOnly&&) = default;
+        MoveOnly(MoveOnly&&)            = default;
         MoveOnly& operator=(MoveOnly&&) = default;
-        MoveOnly(const MoveOnly&) = delete;
+        MoveOnly(const MoveOnly&)       = delete;
     };
     Result<MoveOnly> r(MoveOnly{7});
     ASSERT_TRUE(r.ok());
@@ -59,10 +59,8 @@ TEST(Result, MoveOnlyValue) {
 }
 
 TEST(Result, ErrorMessagePropagates) {
-    auto make = []() -> Result<std::string> {
-        return Err{"not found"};
-    };
-    auto r = make();
+    auto make = []() -> Result<std::string> { return Err{"not found"}; };
+    auto r    = make();
     EXPECT_TRUE(r.err());
     EXPECT_EQ(r.error().message, "not found");
 }

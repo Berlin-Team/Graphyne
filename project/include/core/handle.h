@@ -24,22 +24,21 @@ struct Handle {
     static constexpr u32 kIndexBits = 20;
     static constexpr u32 kGenBits   = 12;
     static constexpr u32 kIndexMask = (1u << kIndexBits) - 1u;
-    static constexpr u32 kGenMask   = (1u << kGenBits)   - 1u;
+    static constexpr u32 kGenMask   = (1u << kGenBits) - 1u;
     static constexpr u32 kInvalid   = 0;
 
     u32 packed = kInvalid;
 
     constexpr Handle() = default;
     constexpr Handle(u32 index, u32 generation)
-        : packed(((generation & kGenMask) << kIndexBits) | (index & kIndexMask))
-    {}
+        : packed(((generation & kGenMask) << kIndexBits) | (index & kIndexMask)) {}
 
-    constexpr u32 index()      const { return packed & kIndexMask; }
-    constexpr u32 generation() const { return (packed >> kIndexBits) & kGenMask; }
-    constexpr bool valid()     const { return packed != kInvalid; }
+    constexpr u32  index() const { return packed & kIndexMask; }
+    constexpr u32  generation() const { return (packed >> kIndexBits) & kGenMask; }
+    constexpr bool valid() const { return packed != kInvalid; }
 
     constexpr explicit operator bool() const { return valid(); }
-    constexpr auto operator<=>(const Handle&) const = default;
+    constexpr auto     operator<=>(const Handle&) const = default;
 
     static constexpr Handle invalid() { return Handle{}; }
 };
@@ -70,8 +69,6 @@ using MaterialHandle = Handle<MaterialTag>;
 namespace std {
 template <class Tag>
 struct hash<::gn::Handle<Tag>> {
-    size_t operator()(const ::gn::Handle<Tag>& h) const noexcept {
-        return std::hash<::gn::u32>{}(h.packed);
-    }
+    size_t operator()(const ::gn::Handle<Tag>& h) const noexcept { return std::hash<::gn::u32>{}(h.packed); }
 };
 } // namespace std

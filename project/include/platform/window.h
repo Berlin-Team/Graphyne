@@ -19,11 +19,11 @@ namespace gn::platform {
 class Window {
 public:
     struct Config {
-        std::string title  = "Graphyne";
-        u32  width         = 1280;
-        u32  height        = 720;
-        bool resizable     = true;
-        bool high_dpi      = true;
+        std::string title     = "Graphyne";
+        u32         width     = 1280;
+        u32         height    = 720;
+        bool        resizable = true;
+        bool        high_dpi  = true;
     };
 
     using EventHandler = std::function<void(const Event&)>;
@@ -48,10 +48,10 @@ public:
     bool should_close() const { return m_should_close; }
     void set_should_close(bool v) { m_should_close = v; }
 
-    u32  width()   const { return m_extent.width; }
-    u32  height()  const { return m_extent.height; }
+    u32      width() const { return m_extent.width; }
+    u32      height() const { return m_extent.height; }
     Extent2D extent() const { return m_extent; }
-    bool minimized() const { return m_minimized; }
+    bool     minimized() const { return m_minimized; }
 
     /// Vulkan instance extensions required by the windowing system.
     std::vector<const char*> required_instance_extensions() const;

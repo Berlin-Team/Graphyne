@@ -25,18 +25,27 @@ namespace gn {
 
 class App;
 
-namespace platform { class Platform; class Window; class Input; }
-namespace rhi      { class Device; class Swapchain; }
-namespace graphics { class Renderer; }
+namespace platform {
+class Platform;
+class Window;
+class Input;
+} // namespace platform
+namespace rhi {
+class Device;
+class Swapchain;
+} // namespace rhi
+namespace graphics {
+class Renderer;
+}
 
 class Engine {
 public:
     struct Config {
-        std::string app_name        = "Graphyne Application";
-        u32         window_width    = 1280;
-        u32         window_height   = 720;
-        bool        resizable       = true;
-        bool        vsync           = true;
+        std::string app_name          = "Graphyne Application";
+        u32         window_width      = 1280;
+        u32         window_height     = 720;
+        bool        resizable         = true;
+        bool        vsync             = true;
         bool        enable_validation = true;
         // Path to a log file. Empty -> console only.
         std::string log_file;
@@ -64,11 +73,11 @@ public:
     void request_exit() { m_running = false; }
 
     bool initialized() const { return m_initialized; }
-    bool running()     const { return m_running; }
+    bool running() const { return m_running; }
 
     // Accessors for App / subsystem code that needs them.
-    platform::Window&  window();
-    platform::Input&   input();
+    platform::Window&   window();
+    platform::Input&    input();
     graphics::Renderer& renderer();
 
     const Config& config() const { return m_config; }
@@ -78,12 +87,12 @@ private:
     bool   m_initialized = false;
     bool   m_running     = false;
 
-    std::unique_ptr<platform::Platform>  m_platform;
-    std::unique_ptr<platform::Window>    m_window;
-    std::unique_ptr<platform::Input>     m_input;
-    std::unique_ptr<rhi::Device>         m_device;
-    std::unique_ptr<rhi::Swapchain>      m_swapchain;
-    std::unique_ptr<graphics::Renderer>  m_renderer;
+    std::unique_ptr<platform::Platform> m_platform;
+    std::unique_ptr<platform::Window>   m_window;
+    std::unique_ptr<platform::Input>    m_input;
+    std::unique_ptr<rhi::Device>        m_device;
+    std::unique_ptr<rhi::Swapchain>     m_swapchain;
+    std::unique_ptr<graphics::Renderer> m_renderer;
 };
 
 } // namespace gn

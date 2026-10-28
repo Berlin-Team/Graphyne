@@ -33,7 +33,7 @@ public:
 
     void on_render(gn::graphics::Frame& frame) override {
         // Animated clear color.
-        const float t = m_time;
+        const float t     = m_time;
         frame.clear_color = gn::Color{
             0.5f + 0.5f * std::sin(t * 0.7f),
             0.5f + 0.5f * std::sin(t * 0.9f + 1.0f),
@@ -42,13 +42,9 @@ public:
         };
     }
 
-    void on_resize(gn::u32 w, gn::u32 h) override {
-        GN_INFO("Window resized to {}x{}", w, h);
-    }
+    void on_resize(gn::u32 w, gn::u32 h) override { GN_INFO("Window resized to {}x{}", w, h); }
 
-    void on_shutdown() override {
-        GN_INFO("DemoApp shutting down");
-    }
+    void on_shutdown() override { GN_INFO("DemoApp shutting down"); }
 
 private:
     float m_time = 0.0f;
@@ -62,6 +58,6 @@ int main(int /*argc*/, char* /*argv*/[]) {
     cfg.log_file      = "graphyne.log";
 
     gn::Engine engine(cfg);
-    DemoApp app;
+    DemoApp    app;
     return engine.run(app);
 }

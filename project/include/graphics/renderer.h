@@ -18,8 +18,13 @@
 #include <array>
 #include <memory>
 
-namespace gn::rhi      { class Device; class Swapchain; }
-namespace gn::platform { class Window; }
+namespace gn::rhi {
+class Device;
+class Swapchain;
+} // namespace gn::rhi
+namespace gn::platform {
+class Window;
+}
 
 namespace gn::graphics {
 
@@ -39,10 +44,10 @@ public:
     Renderer(Renderer&&)                 = delete;
     Renderer& operator=(Renderer&&)      = delete;
 
-    Result<void> initialize(rhi::Device& device,
-                            rhi::Swapchain& swapchain,
+    Result<void> initialize(rhi::Device&      device,
+                            rhi::Swapchain&   swapchain,
                             platform::Window& window,
-                            const Config& cfg = {});
+                            const Config&     cfg = {});
 
     void shutdown();
 
@@ -60,26 +65,30 @@ public:
     Color& clear_color() { return m_current_frame.clear_color; }
 
 private:
-    void   transition_image(VkCommandBuffer cmd, VkImage img,
-                            VkImageLayout old_layout, VkImageLayout new_layout,
-                            VkPipelineStageFlags2 src_stage, VkAccessFlags2 src_access,
-                            VkPipelineStageFlags2 dst_stage, VkAccessFlags2 dst_access);
+    void         transition_image(VkCommandBuffer       cmd,
+                                  VkImage               img,
+                                  VkImageLayout         old_layout,
+                                  VkImageLayout         new_layout,
+                                  VkPipelineStageFlags2 src_stage,
+                                  VkAccessFlags2        src_access,
+                                  VkPipelineStageFlags2 dst_stage,
+                                  VkAccessFlags2        dst_access);
     Result<void> recreate_swapchain();
 
-    rhi::Device*       m_device    = nullptr;
-    rhi::Swapchain*    m_swapchain = nullptr;
-    platform::Window*  m_window    = nullptr;
+    rhi::Device*      m_device    = nullptr;
+    rhi::Swapchain*   m_swapchain = nullptr;
+    platform::Window* m_window    = nullptr;
 
-    rhi::CommandPool   m_command_pool;
+    rhi::CommandPool                               m_command_pool;
     std::array<rhi::FrameSync, kMaxFramesInFlight> m_sync;
 
     Config m_config;
-    u32    m_frame_index           = 0;
-    u32    m_acquired_image_index  = 0;
-    bool   m_needs_recreate        = false;
-    bool   m_frame_in_progress     = false;
+    u32    m_frame_index          = 0;
+    u32    m_acquired_image_index = 0;
+    bool   m_needs_recreate       = false;
+    bool   m_frame_in_progress    = false;
 
-    Frame  m_current_frame;
+    Frame m_current_frame;
 };
 
 } // namespace gn::graphics

@@ -27,15 +27,15 @@ PoolAllocator::PoolAllocator(usize block_size, usize block_alignment, usize bloc
 
     // Allocate aligned backing storage.
     const usize total = m_block_size * m_block_count;
-    void* raw = ::operator new(total, std::align_val_t{block_alignment});
-    m_buffer = static_cast<u8*>(raw);
+    void*       raw   = ::operator new(total, std::align_val_t{block_alignment});
+    m_buffer          = static_cast<u8*>(raw);
 
     // Build the initial free list (singly linked).
     FreeNode* prev = nullptr;
     for (usize i = m_block_count; i-- > 0;) {
-        auto* node  = reinterpret_cast<FreeNode*>(m_buffer + i * m_block_size);
-        node->next  = prev;
-        prev        = node;
+        auto* node = reinterpret_cast<FreeNode*>(m_buffer + i * m_block_size);
+        node->next = prev;
+        prev       = node;
     }
     m_free_head = prev;
 }
@@ -66,12 +66,12 @@ PoolAllocator& PoolAllocator::operator=(PoolAllocator&& other) noexcept {
         if (m_buffer) {
             ::operator delete(m_buffer, std::align_val_t{m_block_alignment});
         }
-        m_buffer          = other.m_buffer;
-        m_free_head       = other.m_free_head;
-        m_block_size      = other.m_block_size;
-        m_block_alignment = other.m_block_alignment;
-        m_block_count     = other.m_block_count;
-        m_used            = other.m_used;
+        m_buffer                = other.m_buffer;
+        m_free_head             = other.m_free_head;
+        m_block_size            = other.m_block_size;
+        m_block_alignment       = other.m_block_alignment;
+        m_block_count           = other.m_block_count;
+        m_used                  = other.m_used;
         other.m_buffer          = nullptr;
         other.m_free_head       = nullptr;
         other.m_block_size      = 0;

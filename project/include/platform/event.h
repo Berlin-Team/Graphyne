@@ -38,22 +38,22 @@ struct Event {
     } resize;
 
     struct {
-        Key key      = Key::Unknown;
-        u16 mods     = 0;   // bitmask of modifier keys
-        bool repeat  = false;
+        Key  key    = Key::Unknown;
+        u16  mods   = 0; // bitmask of modifier keys
+        bool repeat = false;
     } key;
 
     struct {
         MouseButton button = MouseButton::Left;
-        i32 x = 0;
-        i32 y = 0;
+        i32         x      = 0;
+        i32         y      = 0;
     } mouse_button;
 
     struct {
-        i32 x      = 0;
-        i32 y      = 0;
-        i32 dx     = 0;
-        i32 dy     = 0;
+        i32 x  = 0;
+        i32 y  = 0;
+        i32 dx = 0;
+        i32 dy = 0;
     } mouse_move;
 
     struct {

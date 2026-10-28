@@ -19,12 +19,16 @@
 namespace gn {
 
 class Engine;
-namespace graphics { class Frame; }
-namespace platform { struct Event; }
+namespace graphics {
+class Frame;
+}
+namespace platform {
+struct Event;
+}
 
 class App {
 public:
-    App() = default;
+    App()          = default;
     virtual ~App() = default;
 
     App(const App&)            = delete;
@@ -45,7 +49,10 @@ public:
     virtual void on_render(graphics::Frame& frame) { (void)frame; }
 
     /// Called whenever the swap-chain target is resized.
-    virtual void on_resize(u32 width, u32 height) { (void)width; (void)height; }
+    virtual void on_resize(u32 width, u32 height) {
+        (void)width;
+        (void)height;
+    }
 
     /// Called for every platform / input event after polling.
     virtual void on_event(const platform::Event& event) { (void)event; }

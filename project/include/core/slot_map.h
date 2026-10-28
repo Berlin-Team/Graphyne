@@ -49,7 +49,7 @@ public:
             m_slots.push_back(Slot{kInvalid, 0});
         }
 
-        Slot& slot = m_slots[slot_index];
+        Slot& slot      = m_slots[slot_index];
         slot.data_index = static_cast<u32>(m_data.size());
         m_data.emplace_back(std::forward<Args>(args)...);
         m_data_to_slot.push_back(slot_index);
@@ -58,7 +58,7 @@ public:
     }
 
     HandleT insert(const T& value) { return emplace(value); }
-    HandleT insert(T&& value)      { return emplace(std::move(value)); }
+    HandleT insert(T&& value) { return emplace(std::move(value)); }
 
     bool contains(HandleT h) const {
         if (!h.valid()) return false;
@@ -82,15 +82,15 @@ public:
         if (!contains(h)) return false;
 
         const u32 slot_index = h.index();
-        Slot& slot = m_slots[slot_index];
-        const u32 data_idx = slot.data_index;
-        const u32 last_idx = static_cast<u32>(m_data.size()) - 1;
+        Slot&     slot       = m_slots[slot_index];
+        const u32 data_idx   = slot.data_index;
+        const u32 last_idx   = static_cast<u32>(m_data.size()) - 1;
 
         // Swap-and-pop the dense data array.
         if (data_idx != last_idx) {
-            m_data[data_idx] = std::move(m_data[last_idx]);
-            const u32 moved_slot = m_data_to_slot[last_idx];
-            m_data_to_slot[data_idx] = moved_slot;
+            m_data[data_idx]               = std::move(m_data[last_idx]);
+            const u32 moved_slot           = m_data_to_slot[last_idx];
+            m_data_to_slot[data_idx]       = moved_slot;
             m_slots[moved_slot].data_index = data_idx;
         }
         m_data.pop_back();
@@ -114,25 +114,25 @@ public:
         m_slots.push_back(Slot{kInvalid, 0});
     }
 
-    usize size()      const { return m_data.size(); }
-    bool  empty()     const { return m_data.empty(); }
+    usize size() const { return m_data.size(); }
+    bool  empty() const { return m_data.empty(); }
 
     // Dense iteration over the values.
-    auto begin()       { return m_data.begin(); }
-    auto end()         { return m_data.end(); }
+    auto begin() { return m_data.begin(); }
+    auto end() { return m_data.end(); }
     auto begin() const { return m_data.begin(); }
-    auto end()   const { return m_data.end(); }
+    auto end() const { return m_data.end(); }
 
 private:
     struct Slot {
-        u32 data_index;   // kInvalid when slot is free
-        u32 generation;   // 0..kGenMask
+        u32 data_index; // kInvalid when slot is free
+        u32 generation; // 0..kGenMask
     };
     static constexpr u32 kInvalid = ~0u;
 
-    std::vector<Slot> m_slots;          // indirection
-    std::vector<T>    m_data;           // dense storage
-    std::vector<u32>  m_data_to_slot;   // m_data[i] -> owning slot index
+    std::vector<Slot> m_slots;        // indirection
+    std::vector<T>    m_data;         // dense storage
+    std::vector<u32>  m_data_to_slot; // m_data[i] -> owning slot index
     std::vector<u32>  m_free_list;
 };
 

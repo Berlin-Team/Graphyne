@@ -12,8 +12,7 @@ namespace {
 
 VkSurfaceFormatKHR choose_format(const std::vector<VkSurfaceFormatKHR>& formats) {
     for (const auto& f : formats) {
-        if (f.format == VK_FORMAT_B8G8R8A8_SRGB &&
-            f.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+        if (f.format == VK_FORMAT_B8G8R8A8_SRGB && f.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             return f;
         }
     }
@@ -21,7 +20,7 @@ VkSurfaceFormatKHR choose_format(const std::vector<VkSurfaceFormatKHR>& formats)
 }
 
 VkPresentModeKHR choose_present_mode(const std::vector<VkPresentModeKHR>& modes, bool vsync) {
-    if (vsync) return VK_PRESENT_MODE_FIFO_KHR;  // always available
+    if (vsync) return VK_PRESENT_MODE_FIFO_KHR; // always available
     for (auto m : modes) {
         if (m == VK_PRESENT_MODE_MAILBOX_KHR) return m;
     }
@@ -36,14 +35,16 @@ VkExtent2D choose_extent(const VkSurfaceCapabilitiesKHR& caps, Extent2D desired)
         return caps.currentExtent;
     }
     VkExtent2D actual{desired.width, desired.height};
-    actual.width  = std::clamp(actual.width,  caps.minImageExtent.width,  caps.maxImageExtent.width);
+    actual.width  = std::clamp(actual.width, caps.minImageExtent.width, caps.maxImageExtent.width);
     actual.height = std::clamp(actual.height, caps.minImageExtent.height, caps.maxImageExtent.height);
     return actual;
 }
 
 } // namespace
 
-Swapchain::~Swapchain() { shutdown(); }
+Swapchain::~Swapchain() {
+    shutdown();
+}
 
 Result<void> Swapchain::initialize(Device& device, Extent2D desired_extent, bool vsync) {
     m_device = &device;
@@ -65,9 +66,9 @@ Result<void> Swapchain::initialize(Device& device, Extent2D desired_extent, bool
     std::vector<VkPresentModeKHR> modes(pm_count);
     vkGetPhysicalDeviceSurfacePresentModesKHR(phys, surface, &pm_count, modes.data());
 
-    const VkSurfaceFormatKHR fmt   = choose_format(formats);
-    const VkPresentModeKHR   mode  = choose_present_mode(modes, vsync);
-    const VkExtent2D         ext   = choose_extent(caps, desired_extent);
+    const VkSurfaceFormatKHR fmt  = choose_format(formats);
+    const VkPresentModeKHR   mode = choose_present_mode(modes, vsync);
+    const VkExtent2D         ext  = choose_extent(caps, desired_extent);
 
     u32 image_count = caps.minImageCount + 1;
     if (caps.maxImageCount > 0 && image_count > caps.maxImageCount) {
@@ -84,8 +85,8 @@ Result<void> Swapchain::initialize(Device& device, Extent2D desired_extent, bool
     sci.imageArrayLayers = 1;
     sci.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
-    const auto qfi = device.queue_families();
-    const u32 indices[] = {qfi.graphics, qfi.present};
+    const auto qfi       = device.queue_families();
+    const u32  indices[] = {qfi.graphics, qfi.present};
     if (qfi.graphics != qfi.present) {
         sci.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
         sci.queueFamilyIndexCount = 2;
@@ -114,10 +115,10 @@ Result<void> Swapchain::initialize(Device& device, Extent2D desired_extent, bool
     m_views.resize(actual_count);
     for (u32 i = 0; i < actual_count; ++i) {
         VkImageViewCreateInfo vci{};
-        vci.sType    = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        vci.image    = m_images[i];
-        vci.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        vci.format   = fmt.format;
+        vci.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        vci.image                           = m_images[i];
+        vci.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
+        vci.format                          = fmt.format;
         vci.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
         vci.subresourceRange.baseMipLevel   = 0;
         vci.subresourceRange.levelCount     = 1;
@@ -166,12 +167,8 @@ bool Swapchain::acquire_next_image(VkSemaphore signal, u32& out_index, bool& out
     out_invalidated = false;
     if (!m_device || m_swapchain == VK_NULL_HANDLE) return false;
 
-    VkResult res = vkAcquireNextImageKHR(m_device->logical_device(),
-                                         m_swapchain,
-                                         std::numeric_limits<u64>::max(),
-                                         signal,
-                                         VK_NULL_HANDLE,
-                                         &out_index);
+    VkResult res = vkAcquireNextImageKHR(
+        m_device->logical_device(), m_swapchain, std::numeric_limits<u64>::max(), signal, VK_NULL_HANDLE, &out_index);
     if (res == VK_ERROR_OUT_OF_DATE_KHR) {
         out_invalidated = true;
         return false;

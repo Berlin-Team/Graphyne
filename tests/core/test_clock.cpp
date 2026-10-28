@@ -14,11 +14,11 @@ TEST(Clock, FirstTickReturnsZero) {
 
 TEST(Clock, SubsequentTickIsPositive) {
     Clock c;
-    c.tick();                                      // prime
+    c.tick(); // prime
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
     const float dt = c.tick();
     EXPECT_GT(dt, 0.0f);
-    EXPECT_LT(dt, 1.0f);                           // sanity bound
+    EXPECT_LT(dt, 1.0f); // sanity bound
 }
 
 TEST(Clock, DeltaSecondsMatchesLastTick) {
@@ -44,11 +44,11 @@ TEST(Clock, ResetRestartsTimer) {
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
     c.tick();
     c.reset();
-    EXPECT_EQ(c.tick(), 0.0f);  // first tick after reset is 0
+    EXPECT_EQ(c.tick(), 0.0f); // first tick after reset is 0
 }
 
 TEST(Clock, ElapsedIsMonotonic) {
-    Clock c;
+    Clock        c;
     const double e1 = c.elapsed();
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
     const double e2 = c.elapsed();

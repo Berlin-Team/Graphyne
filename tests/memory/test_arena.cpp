@@ -29,7 +29,7 @@ TEST(Arena, ResetRewindsButPreservesPeak) {
     const auto peak_before = a.peak();
     a.reset();
     EXPECT_EQ(a.used(), 0u);
-    EXPECT_EQ(a.peak(), peak_before);    // peak survives reset
+    EXPECT_EQ(a.peak(), peak_before); // peak survives reset
     void* p = a.allocate(200, 8);
     EXPECT_NE(p, nullptr);
 }
@@ -38,13 +38,13 @@ TEST(Arena, ExhaustionReturnsNull) {
     Arena a(64);
     EXPECT_NE(a.allocate(32, 8), nullptr);
     EXPECT_NE(a.allocate(16, 8), nullptr);
-    EXPECT_EQ(a.allocate(64, 8), nullptr);  // would overflow
+    EXPECT_EQ(a.allocate(64, 8), nullptr); // would overflow
 }
 
 TEST(Arena, ZeroSizeOrBadAlignmentReturnsNull) {
     Arena a(64);
     EXPECT_EQ(a.allocate(0, 8), nullptr);
-    EXPECT_EQ(a.allocate(8, 3), nullptr);    // 3 is not power-of-two
+    EXPECT_EQ(a.allocate(8, 3), nullptr); // 3 is not power-of-two
 }
 
 TEST(Arena, ZeroCapacityFailsGracefully) {
@@ -53,9 +53,12 @@ TEST(Arena, ZeroCapacityFailsGracefully) {
 }
 
 TEST(Arena, CreateConstructsObjectInPlace) {
-    struct Foo { int x; explicit Foo(int v) : x(v) {} };
+    struct Foo {
+        int x;
+        explicit Foo(int v) : x(v) {}
+    };
     Arena a(256);
-    Foo* f = a.create<Foo>(42);
+    Foo*  f = a.create<Foo>(42);
     ASSERT_NE(f, nullptr);
     EXPECT_EQ(f->x, 42);
     f->~Foo();

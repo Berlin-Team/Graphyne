@@ -26,7 +26,7 @@ TEST(Handle, PacksIndexAndGeneration) {
 TEST(Handle, MasksApplied) {
     // Generation > kGenMask should be masked.
     TH h{1, TH::kGenMask + 7};
-    EXPECT_EQ(h.generation(), 6u);  // (kGenMask + 7) & kGenMask = 6
+    EXPECT_EQ(h.generation(), 6u); // (kGenMask + 7) & kGenMask = 6
     EXPECT_EQ(h.index(), 1u);
 }
 
@@ -41,8 +41,8 @@ TEST(Handle, OrderingAndEquality) {
 
 TEST(Handle, HashUsableInUnorderedContainer) {
     std::hash<TH> hasher;
-    TH a{5, 1};
-    TH b{5, 1};
+    TH            a{5, 1};
+    TH            b{5, 1};
     EXPECT_EQ(hasher(a), hasher(b));
 }
 

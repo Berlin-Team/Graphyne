@@ -16,7 +16,9 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-namespace gn::platform { class Window; }
+namespace gn::platform {
+class Window;
+}
 
 namespace gn::rhi {
 
@@ -29,10 +31,10 @@ struct QueueFamilyIndices {
 class Device {
 public:
     struct Config {
-        std::string app_name        = "Graphyne Application";
+        std::string app_name          = "Graphyne Application";
         bool        enable_validation = true;
         // Vulkan API version target. 1.3 enables dynamic rendering / sync2.
-        u32         api_version     = VK_API_VERSION_1_3;
+        u32 api_version = VK_API_VERSION_1_3;
     };
 
     Device() = default;
@@ -52,23 +54,23 @@ public:
     /// Block until all GPU work on this device has completed.
     void wait_idle() const;
 
-    VkInstance        instance()         const { return m_instance; }
-    VkPhysicalDevice  physical_device()  const { return m_physical_device; }
-    VkDevice          logical_device()   const { return m_device; }
-    VkSurfaceKHR      surface()          const { return m_surface; }
-    VkQueue           graphics_queue()   const { return m_graphics_queue; }
-    VkQueue           present_queue()    const { return m_present_queue; }
-    QueueFamilyIndices queue_families()  const { return m_queue_families; }
-    bool              validation_enabled() const { return m_validation; }
+    VkInstance         instance() const { return m_instance; }
+    VkPhysicalDevice   physical_device() const { return m_physical_device; }
+    VkDevice           logical_device() const { return m_device; }
+    VkSurfaceKHR       surface() const { return m_surface; }
+    VkQueue            graphics_queue() const { return m_graphics_queue; }
+    VkQueue            present_queue() const { return m_present_queue; }
+    QueueFamilyIndices queue_families() const { return m_queue_families; }
+    bool               validation_enabled() const { return m_validation; }
 
 private:
-    Result<void> create_instance(const Config& cfg, const std::vector<const char*>& window_exts);
-    Result<void> setup_debug_messenger();
-    Result<void> pick_physical_device();
-    Result<void> create_logical_device();
-    bool         is_device_suitable(VkPhysicalDevice device) const;
+    Result<void>       create_instance(const Config& cfg, const std::vector<const char*>& window_exts);
+    Result<void>       setup_debug_messenger();
+    Result<void>       pick_physical_device();
+    Result<void>       create_logical_device();
+    bool               is_device_suitable(VkPhysicalDevice device) const;
     QueueFamilyIndices find_queue_families(VkPhysicalDevice device) const;
-    bool         check_device_extensions(VkPhysicalDevice device) const;
+    bool               check_device_extensions(VkPhysicalDevice device) const;
 
     VkInstance               m_instance        = VK_NULL_HANDLE;
     VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
