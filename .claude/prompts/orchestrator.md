@@ -12,10 +12,10 @@ context stays free for planning and judgment across a long project.
 </role>
 
 <context>
-- Graphyne is a C++ project built with CMake and vcpkg (see `README.md`). Its owner set this repository
-  up for agent work on 2026-10-28 with a **generic starter kit** only: `CLAUDE.md`, an `AGENTS.md` stub,
-  five general agents in `.claude/agents/`, guard hooks in `.claude/hooks/`, and the ponytail skills in
-  `.claude/skills/`. Nothing in it is specific to Graphyne yet; making it specific is the first task.
+- Graphyne is a lightweight C++20 game engine for learning and experimenting (ECS, rendering,
+  multithreading), built with CMake and vcpkg. `AGENTS.md` has the stack, layout, commands and rules;
+  `CLAUDE.md` routes work to the agents in `.claude/agents/`; plans are in `docs/ROADMAP.md`, decisions in
+  `docs/adr/`. The Vulkan + SDL2 stack is under review (roadmap item 3).
 - Windows machine. Never run `python` (a hook blocks it). Give every long run a hard time limit and stop
   every process you start; never kill processes by name.
 - No trace of an assistant in git or on GitHub: no `Co-Authored-By` trailer, no "Generated with" line
@@ -47,10 +47,25 @@ If `AGENTS.md` still says "Status: stub", this session's job is to make the setu
 </first_session_bootstrap>
 
 <later_sessions>
-Once `AGENTS.md` is real: `git status`, `git log --oneline -15`, read `AGENTS.md`, `CLAUDE.md` and the
-project's plan or issues, then resume at the next agreed piece of work. Say in one line what the session
-will cover.
+Once `AGENTS.md` is real: `git status`, `git log --oneline -15`, `git branch -a`, `gh pr list` (open PRs
+waiting for the owner), read `AGENTS.md`, `CLAUDE.md`, `docs/ROADMAP.md` and the ADR index, then resume at
+the next agreed piece of work. Say in one line what the session will cover.
 </later_sessions>
+
+<picking_work>
+- Take the first item in **Now** of `docs/ROADMAP.md` that has no open PR. One item per branch and PR;
+  split a large item into steps the owner can review separately, each its own PR.
+- Before the first brief, write a short plan: steps, which agent does each, acceptance criteria, what you
+  will ask the owner. Decisions that are hard to reverse go to the owner first and into an ADR
+  (`write-adr` skill) before implementation.
+- Pick the implementer by area (`CLAUDE.md`). An item spanning areas runs its implementers one after
+  another, never two writers on the same files.
+- When an item is done: `build-runner` green, `code-reviewer` without blocking issues, you have read the
+  diff, `docs/ROADMAP.md` updated (item moved to Done with the date). Commit, push the branch, open the PR
+  into `develop` (no assistant trace), report to the owner, and stop for their review unless they asked
+  you to continue with the next item.
+- Things you notice outside the item go to the roadmap Backlog, not into the current PR.
+</picking_work>
 
 <delegation>
 - **Haiku 5.5** for reading and reporting (code, docs, builds, test runs, logs).
