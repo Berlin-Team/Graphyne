@@ -18,7 +18,7 @@ TEST(Result, HoldsValue) {
 }
 
 TEST(Result, HoldsError) {
-    Result<int> r(Err{"failure"});
+    Result<int> r{Err{"failure"}};
     EXPECT_FALSE(r.ok());
     EXPECT_TRUE(r.err());
     EXPECT_EQ(r.error().what(), "failure");
@@ -27,7 +27,7 @@ TEST(Result, HoldsError) {
 
 TEST(Result, ValueOr) {
     Result<int> ok(10);
-    Result<int> bad(Err{"x"});
+    Result<int> bad{Err{"x"}};
     EXPECT_EQ(ok.value_or(0), 10);
     EXPECT_EQ(bad.value_or(99), 99);
 }
@@ -39,7 +39,7 @@ TEST(Result, VoidOk) {
 }
 
 TEST(Result, VoidError) {
-    Result<void> r(Err{"boom"});
+    Result<void> r{Err{"boom"}};
     EXPECT_FALSE(r.ok());
     EXPECT_TRUE(r.err());
     EXPECT_EQ(r.error().what(), "boom");
