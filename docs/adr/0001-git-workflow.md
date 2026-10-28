@@ -12,8 +12,9 @@ branch, squash-merged PRs (`(#1)`, `(#3)`) and conventional commit types with op
 
 Work happens on short-lived branches off `develop` (`feat/`, `fix/`, `chore/`, `docs/`, `build/`, `ci/`),
 one roadmap item or fix per branch. Agents may commit on their branch, push it and open a PR into
-`develop`. The owner reviews and squash-merges; only the owner updates `main`. Commit subjects follow
-`type: :gitmoji: subject`, the gitmoji being optional. No commit, PR or comment carries any trace of an
+`develop`. The owner reviews and squash-merges; only the owner updates `main`. Commit subjects and PR
+titles follow plain Conventional Commits, `type(optional scope): subject`, with no emoji or gitmoji
+(amended 2026-10-28; earlier commits used optional gitmoji). No commit, PR or comment carries any trace of an
 assistant (no `Co-Authored-By` trailer, no "Generated with" line).
 
 ## Consequences

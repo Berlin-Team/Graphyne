@@ -97,8 +97,10 @@ The code is the reference for style; the configs are being aligned to it (ADR 00
 - `develop` is the integration branch; `main` is for releases and only the owner updates it.
 - Work on a branch off `develop`: `feat/…`, `fix/…`, `chore/…`, `docs/…`, `build/…`, `ci/…`. One roadmap
   item or fix per branch.
-- Commits: conventional type, optional gitmoji shortcode, imperative subject:
-  `feat: :sparkles: add sprite batcher`, `fix: handle swapchain resize`.
+- Commits and PR titles: plain Conventional Commits (<https://www.conventionalcommits.org>), no emoji or
+  gitmoji shortcodes: `type(optional scope): imperative subject`, e.g. `feat(graphics): add sprite batcher`,
+  `fix: handle swapchain resize`. Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`,
+  `build`, `ci`, `chore`. Breaking changes: `!` after the type and a `BREAKING CHANGE:` footer.
 - Agents may commit on their branch, push that branch and open a PR into `develop`. The owner reviews and
   squash-merges. Never push to `develop` or `main`, never merge, never force-push a shared branch.
 - **No trace of an assistant in git or on GitHub**: no `Co-Authored-By` trailer, no "Generated with" line,
