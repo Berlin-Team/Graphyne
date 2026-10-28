@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 
 # ---------------------------------------------------------------------------
 # vcpkg toolchain bootstrap (must happen before project())
@@ -198,6 +198,8 @@ if(GRAPHYNE_COVERAGE AND GRAPHYNE_BUILD_TESTS)
         EXCLUDE
             "/usr/*"
             "*/_deps/*"
+            "*/vcpkg/*"
+            "*/vcpkg_installed/*"
             "*/tests/*"
             "*/examples/*"
     )

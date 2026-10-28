@@ -99,7 +99,7 @@ if (-not (Test-Path (Join-Path $VcpkgDir '.git'))) {
         throw "$VcpkgDir exists but doesn't contain a git repo. Remove it or pass -VcpkgDir with another path."
     }
 
-    git clone --depth 1 https://github.com/microsoft/vcpkg.git $VcpkgDir
+    git clone https://github.com/microsoft/vcpkg.git $VcpkgDir
 } else {
     Write-Host "    vcpkg already cloned in $VcpkgDir"
 }

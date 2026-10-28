@@ -18,11 +18,19 @@ Plans live in `docs/ROADMAP.md`, decisions in `docs/adr/` (one numbered file per
 
 ## Stack
 
-- C++20 (no compiler extensions), CMake (presets need ≥ 3.21), vcpkg manifest mode (`vcpkg.json`).
-- Dependencies: Vulkan (headers + loader), SDL2, spdlog, fmt (through spdlog), glm, GoogleTest.
+- C++20 (no compiler extensions), CMake ≥ 3.21, vcpkg manifest mode (`vcpkg.json`) pinned by
+  `builtin-baseline` (vcpkg release 2026.10.16). Local vcpkg clones must contain that commit; CI uses the
+  same commit. Changing the baseline is a dependency change: ask the owner.
+- Dependencies (all from vcpkg, on every platform): Vulkan (headers + loader), SDL2, spdlog, fmt (through
+  spdlog), glm, GoogleTest.
 - Platforms: Windows (MSVC, Visual Studio 2022) and Linux (GCC) are first-class; macOS best effort.
-- CI: `.github/workflows/ci.yml` (Linux build + tests + coverage, Windows MSVC build + tests,
-  clang-format check).
+- CI: `.github/workflows/ci.yml`. clang-format first; then Linux (GCC, ubuntu-24.04, tests + coverage) and
+  Windows (MSVC, tests; Debug on PRs, Debug + Release on push to `develop`/`main`). Docs-only and
+  `.claude/`-only changes skip CI.
+- **CI minutes are budgeted** (the repo is going private: 3000 Actions minutes a month, Windows billed 2x,
+  macOS 10x). Every CI change keeps the vcpkg binary cache effective, cancels superseded runs, runs cheap
+  checks first, sets `timeout-minutes`, and adds no runner, matrix entry or macOS job without the owner's
+  approval. Don't push to a PR branch just to "see what CI says" when a local build can answer.
 
 ## Layout
 

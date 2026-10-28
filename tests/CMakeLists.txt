@@ -3,7 +3,7 @@
 # Uses GoogleTest. All tests are linked into a single executable
 # `graphyne_tests` so coverage runs in one process.
 
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
 
 set(GRAPHYNE_TEST_SOURCES

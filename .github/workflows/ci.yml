@@ -3,39 +3,99 @@ name: CI
 on:
   push:
     branches: [main, develop]
+    paths-ignore: ["**.md", "docs/**", ".claude/**", "LICENSE"]
   pull_request:
     branches: [main, develop]
+    paths-ignore: ["**.md", "docs/**", ".claude/**", "LICENSE"]
+
+# One run per workflow and ref; a new push to a PR cancels the older run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # vcpkg 2026.10.16 (same commit as "builtin-baseline" in vcpkg.json).
+  VCPKG_COMMIT: 9eec002df1cd109f8f104cd966a763daf9751489
+  # Binary cache on disk, saved with actions/cache. run-vcpkg's default (x-gha) needs
+  # ACTIONS_RUNTIME_TOKEN, which GitHub no longer exposes to steps.
+  VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/.vcpkg-bincache,readwrite
 
 jobs:
+  # ---------------------------------------------------------------------------
+  # Format check. Runs first; the build jobs wait for it.
+  # ---------------------------------------------------------------------------
+  code-quality:
+    name: clang-format
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      # Same version as the LLVM bundled with Visual Studio 2022; output differs between versions.
+      - name: Install clang-format
+        run: pipx install clang-format==19.1.5 # ubuntu-24.04's system pip refuses global installs
+      - name: Run clang-format --dry-run
+        run: |
+          find project/include project/src tests examples -type f \
+            \( -iname '*.cpp' -o -iname '*.h' -o -iname '*.hpp' \) -print0 \
+            | xargs -0 clang-format --dry-run --Werror
+
   # ---------------------------------------------------------------------------
   # Linux: build, run unit tests, and produce an lcov coverage report.
   # ---------------------------------------------------------------------------
   linux-build-test:
     name: Linux (gcc) + tests + coverage
-    runs-on: ubuntu-22.04
+    needs: code-quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install build deps
+      # Build tools, plus the system headers the vcpkg sdl2 port (x11, wayland,
+      # ibus, dbus features) and the vulkan loader need but cannot install.
+      - name: Install system packages
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            build-essential cmake ninja-build \
-            libvulkan-dev vulkan-validationlayers spirv-tools glslang-tools \
-            libsdl2-dev \
-            libfmt-dev libspdlog-dev libglm-dev \
-            libgtest-dev googletest \
-            lcov
+            ninja-build lcov pkg-config \
+            libx11-dev libxft-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
+            libxi-dev libxss-dev libxinerama-dev libxkbcommon-dev libxcb1-dev \
+            libwayland-dev wayland-protocols libegl1-mesa-dev libgl1-mesa-dev \
+            libibus-1.0-dev libdbus-1-dev libudev-dev libasound2-dev
+
+      - name: Restore vcpkg binary cache
+        id: bincache
+        uses: actions/cache/restore@v4
+        with:
+          path: .vcpkg-bincache
+          key: vcpkg-x64-linux-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-x64-linux-${{ env.VCPKG_COMMIT }}-
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p .vcpkg-bincache
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }} # 2026.10.16
 
       - name: Configure
         run: |
           cmake -S . -B build \
             -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake \
             -DCMAKE_BUILD_TYPE=Debug \
             -DGRAPHYNE_BUILD_TESTS=ON \
             -DGRAPHYNE_BUILD_EXAMPLES=ON \
             -DGRAPHYNE_COVERAGE=ON \
             -DGRAPHYNE_WARNINGS_AS_ERRORS=OFF
+
+      # Save as soon as the dependencies are built, so a later failure keeps the cache.
+      - name: Save vcpkg binary cache
+        if: ${{ !cancelled() && steps.bincache.outputs.cache-hit != 'true' && hashFiles('.vcpkg-bincache/**') != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .vcpkg-bincache
+          key: vcpkg-x64-linux-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
 
       - name: Build
         run: cmake --build build --parallel
@@ -60,54 +120,52 @@ jobs:
           path: build/coverage/coverage.filtered.info
 
   # ---------------------------------------------------------------------------
-  # Windows: just configure + build (no tests run because a Vulkan-capable
-  # runner is required to run the engine itself, but the headless unit tests
-  # could be enabled with a future runner image).
+  # Windows: configure, build and run the headless unit tests. Pull requests
+  # build Debug only; pushes to main/develop add Release.
   # ---------------------------------------------------------------------------
   windows-build:
-    name: Windows (MSVC) build
+    name: Windows (MSVC) ${{ matrix.build_type }}
+    needs: code-quality
     runs-on: windows-latest
+    timeout-minutes: 60
     strategy:
+      fail-fast: false
       matrix:
-        build_type: [Debug, Release]
+        build_type: ${{ fromJSON(github.event_name == 'pull_request' && '["Debug"]' || '["Debug","Release"]') }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Restore vcpkg binary cache
+        id: bincache
+        uses: actions/cache/restore@v4
+        with:
+          path: .vcpkg-bincache
+          key: vcpkg-x64-windows-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-x64-windows-${{ env.VCPKG_COMMIT }}-
+
+      - name: Create vcpkg binary cache directory
+        shell: bash
+        run: mkdir -p .vcpkg-bincache
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgGitCommitId: "53bef8994c541b6561884a8395ea35715ece75db" # 2024.01.12
-
-      - name: Setup Vulkan SDK
-        uses: humbletim/setup-vulkan-sdk@v1.2.1
-        with:
-          vulkan-query-version: 1.3.243.0
-          vulkan-components: Vulkan-Headers, Vulkan-Loader
-          vulkan-use-cache: true
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }} # 2026.10.16
 
       - name: Configure
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
+      # Both build types use the same x64-windows packages, so only Debug saves.
+      - name: Save vcpkg binary cache
+        if: ${{ !cancelled() && matrix.build_type == 'Debug' && steps.bincache.outputs.cache-hit != 'true' && hashFiles('.vcpkg-bincache/**') != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .vcpkg-bincache
+          key: vcpkg-x64-windows-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
+
       - name: Build
-        run: cmake --build build --config ${{ matrix.build_type }} --parallel
+        run: cmake --build build --config ${{ matrix.build_type }} --parallel -- /nodeReuse:false
 
       - name: Run tests
         working-directory: build
         run: ctest -C ${{ matrix.build_type }} --output-on-failure
-
-  # ---------------------------------------------------------------------------
-  # Format check.
-  # ---------------------------------------------------------------------------
-  code-quality:
-    name: clang-format
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      # Same version as the LLVM bundled with Visual Studio 2022; output differs between versions.
-      - name: Install clang-format
-        run: pip install clang-format==19.1.5
-      - name: Run clang-format --dry-run
-        run: |
-          find project/include project/src tests examples -type f \
-            \( -iname '*.cpp' -o -iname '*.h' -o -iname '*.hpp' \) -print0 \
-            | xargs -0 clang-format --dry-run --Werror
