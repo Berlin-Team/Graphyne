@@ -54,6 +54,15 @@ function(graphyne_add_coverage_target)
         return()
     endif()
 
+    # lcov 2.x (Ubuntu 24.04+) turns gcov version/path quirks into fatal errors; 1.x rejects these categories.
+    set(LCOV_TOLERANT "")
+    execute_process(COMMAND ${LCOV_EXE} --version OUTPUT_VARIABLE LCOV_VERSION_OUT ERROR_QUIET)
+    if(LCOV_VERSION_OUT MATCHES "version ([0-9]+)")
+        if(CMAKE_MATCH_1 GREATER_EQUAL 2)
+            set(LCOV_TOLERANT --ignore-errors unused,mismatch,inconsistent)
+        endif()
+    endif()
+
     set(COVERAGE_DIR "${CMAKE_BINARY_DIR}/coverage")
     set(RAW_INFO "${COVERAGE_DIR}/coverage.info")
     set(FILTERED_INFO "${COVERAGE_DIR}/coverage.filtered.info")
@@ -78,6 +87,7 @@ function(graphyne_add_coverage_target)
                             --capture --initial
                             --output-file ${COVERAGE_DIR}/baseline.info
                             --rc lcov_branch_coverage=1
+                            ${LCOV_TOLERANT}
                             --quiet
 
         # Run tests
@@ -88,6 +98,7 @@ function(graphyne_add_coverage_target)
                             --capture
                             --output-file ${COVERAGE_DIR}/test.info
                             --rc lcov_branch_coverage=1
+                            ${LCOV_TOLERANT}
                             --quiet
 
         # Combine baseline + test
@@ -95,18 +106,21 @@ function(graphyne_add_coverage_target)
                             --add-tracefile ${COVERAGE_DIR}/test.info
                             --output-file ${RAW_INFO}
                             --rc lcov_branch_coverage=1
+                            ${LCOV_TOLERANT}
                             --quiet
 
         # Filter out system / external / test code
         COMMAND ${LCOV_EXE} --remove ${RAW_INFO} ${EXCLUDE_ARGS}
                             --output-file ${FILTERED_INFO}
                             --rc lcov_branch_coverage=1
+                            ${LCOV_TOLERANT}
                             --quiet
 
         # Render
         COMMAND ${GENHTML_EXE} ${FILTERED_INFO}
                                --output-directory ${HTML_DIR}
                                --branch-coverage
+                               ${LCOV_TOLERANT}
                                --title "Graphyne Coverage"
                                --legend
                                --demangle-cpp

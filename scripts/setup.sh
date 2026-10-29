@@ -141,7 +141,7 @@ install_vcpkg() {
             echo "Path $VCPKG_ROOT exists but isn't a vcpkg clone. Remove it or set VCPKG_ROOT." >&2
             exit 1
         fi
-        git clone --depth 1 https://github.com/microsoft/vcpkg.git "$VCPKG_ROOT"
+        git clone https://github.com/microsoft/vcpkg.git "$VCPKG_ROOT"
     else
         ok "vcpkg already cloned"
     fi

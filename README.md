@@ -24,17 +24,20 @@ multithreaded systems, and modular engine design.
 
 ## Building
 
-Requirements: CMake ≥ 3.20, a C++20 compiler, Vulkan SDK 1.3, and either vcpkg
-or system packages for SDL2, fmt, spdlog, glm, and (for tests) GoogleTest.
+Requirements: CMake ≥ 3.21 (the presets file is version 3), a C++20 compiler, and vcpkg with
+`VCPKG_ROOT` set (the presets set no toolchain file; the top-level `CMakeLists.txt` picks up vcpkg's from
+`VCPKG_ROOT`). Dependencies (Vulkan headers and loader, SDL2, fmt,
+spdlog, glm, GoogleTest) come from vcpkg at the baseline pinned in `vcpkg.json`; on Windows use the
+`msvc` preset (`cmake --preset msvc`). The vcpkg clone must contain the baseline commit (`git fetch`).
 
 ### First-time setup
 
-One-shot scripts handle the prerequisites:
+One-shot scripts install the prerequisites (build tools and a vcpkg clone). Dependencies always come from vcpkg:
 
 ```bash
-# Linux / macOS  (apt / dnf / pacman / brew; falls back to vcpkg)
+# Linux / macOS  (build tools via apt / dnf / pacman / brew)
 ./scripts/setup.sh
-./scripts/setup.sh --vcpkg            # use vcpkg manifest mode instead
+./scripts/setup.sh --both            # also clone vcpkg and install the dependencies from it
 
 # Windows (PowerShell)
 pwsh -ExecutionPolicy Bypass -File scripts\setup.ps1

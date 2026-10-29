@@ -8,22 +8,16 @@ multithreading). The stack (Vulkan + SDL2, 2024) is being reviewed before new fe
 
 ## Now
 
-1. **Refresh the toolchain.** Add a `builtin-baseline` to `vcpkg.json` (there is none) and use the same
-   vcpkg commit in the Windows CI job instead of `2024.01.12`; decide whether Linux CI keeps apt packages
-   or moves to vcpkg; drop the unused `tests` feature; `find_package(GTest CONFIG REQUIRED)`; Linux CI off
-   `ubuntu-22.04`; Windows CI Vulkan SDK off 1.3.243; README says CMake ≥ 3.21 (presets v3) and that
-   presets need `VCPKG_ROOT`; fix the stale "tests don't run" comment in `ci.yml`. Done when local and
-   Windows CI builds resolve the same port versions and all CI jobs are green.
-2. **Stack review → ADR 0003** (owner decides). Windowing: SDL2 (deprecated upstream) → SDL3, or other.
+1. **Stack review → ADR 0003** (owner decides). Windowing: SDL2 (deprecated upstream) → SDL3, or other.
    Graphics: raw Vulkan, SDL3 GPU API, or another layer, judged against "lightweight and experimental".
    Research with `docs-researcher`, present options with costs, record the owner's choice, then plan the
    migration as its own item.
 
 ## Next
 
-3. **Textures and sprites** on the chosen stack (`origin/feat/texture-rendering` holds earlier work;
-   reassess it after item 2).
-4. **ECS and scenes**: the main experiment. Pure C++, fully unit-tested, independent of rendering.
+2. **Textures and sprites** on the chosen stack (`origin/feat/texture-rendering` holds earlier work;
+   reassess it after item 1).
+3. **ECS and scenes**: the main experiment. Pure C++, fully unit-tested, independent of rendering.
 
 ## Backlog
 
@@ -40,6 +34,10 @@ multithreading). The stack (Vulkan + SDL2, 2024) is being reviewed before new fe
 - Names that break the naming rules: `Ok()` in `core/result.h`, the colour constants in
   `graphics/color.h` (no `k` prefix), the `r_`/`g_`/`b_`/`a_` parameters there. Rename, or record them
   as exceptions in ADR 0002.
+- `scripts/setup.sh` still defaults to system packages; make vcpkg its default to match the vcpkg-only
+  policy.
+- If CI checks become required in branch protection, docs-only PRs (skipped by `paths-ignore`) can't
+  merge: add an always-green fallback job then.
 
 ## Done
 
@@ -47,3 +45,5 @@ multithreading). The stack (Vulkan + SDL2, 2024) is being reviewed before new fe
 - 2026-10-28: style configs follow the code (ADR 0002); one-off clang-format pass; CI pins
   clang-format 19.1.5. Also fixed the GCC/Clang build (nested `Config` default arguments replaced by
   overloads) and the Windows CI job (`setup-vulkan-sdk` v1.2.1, off the disabled `actions/cache@v2`).
+- 2026-10-28: toolchain refresh. vcpkg baseline 2026.10.16 everywhere (Linux CI moved from apt to vcpkg),
+  CMake ≥ 3.21, ubuntu-24.04, no Vulkan SDK step, vcpkg binary cache, CI trimmed for the minutes budget.
