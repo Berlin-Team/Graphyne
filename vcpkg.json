@@ -7,7 +7,14 @@
   "dependencies": [
     "vulkan",
     "vulkan-headers",
-    "sdl2",
+    {
+      "name": "sdl2",
+      "default-features": false,
+      "features": [
+        { "name": "wayland", "platform": "linux" },
+        { "name": "x11", "platform": "linux" }
+      ]
+    },
     "spdlog",
     "glm",
     "fmt",
